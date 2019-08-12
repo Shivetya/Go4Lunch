@@ -75,6 +75,10 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
     implementation 'com.google.firebase:firebase-core:17.0.1'
 
+    //facebook
+    //noinspection GradleDependency
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
+
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.4.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
