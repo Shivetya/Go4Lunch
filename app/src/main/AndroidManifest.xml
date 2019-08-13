@@ -14,8 +14,14 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activities.SettingsActivity">
+        </activity>
         <activity
-                android:name=".activities.MainActivity">
+                android:name=".activities.LoggedActivity"
+                android:label="@string/title_activity_logged"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

@@ -6,11 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
+import com.firebase.ui.auth.data.model.User
 import com.google.android.material.snackbar.Snackbar
 import com.gt.go4lunch.R
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : UserActivity() {
 
     companion object{
         private const val ID_ACTIVITY_SIGN_IN = 1
@@ -22,6 +23,14 @@ class MainActivity : AppCompatActivity() {
 
         activity_main_button_login_mail.setOnClickListener {
             this.startLoginByMailActivity()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (isUserLogged()){
+            startLoggedActivity()
         }
     }
 
@@ -52,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == ID_ACTIVITY_SIGN_IN){
             if (resultCode == RESULT_OK){
-                //startActivityLogged()
+                startLoggedActivity()
             } else {
                 when (response?.error?.errorCode){
                     null -> Snackbar.make(activity_main_root, "Authentication Canceled", Snackbar.LENGTH_SHORT).show()
@@ -61,5 +70,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun startLoggedActivity(){
+        val intent = Intent(this, LoggedActivity::class.java)
+        this.startActivity(intent)
     }
 }
