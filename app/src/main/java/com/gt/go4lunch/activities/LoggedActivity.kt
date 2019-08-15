@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import android.view.Menu
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.firebase.ui.auth.AuthUI
 import com.gt.go4lunch.R
 import kotlinx.android.synthetic.main.activity_logged.*
 import kotlinx.android.synthetic.main.nav_header_logged.view.*
@@ -69,11 +70,11 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
             R.id.nav_gallery -> {
 
             }
-            R.id.nav_slideshow -> {
-
-            }
             R.id.nav_drawer_settings -> {
                 startSettingsActivity()
+            }
+            R.id.nav_drawer_logout -> {
+                logoutUser()
             }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -127,5 +128,11 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
     private fun startSettingsActivity(){
         val intent = Intent(this, SettingsActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun logoutUser(){
+        AuthUI.getInstance()
+            .signOut(this)
+            .addOnSuccessListener(this, this.updateUIAfterRequestsCompleted(LOGOUT_USER_TASK))
     }
 }

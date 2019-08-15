@@ -28,5 +28,8 @@
     <string name="info_no_email_found">No email found</string>
     <string name="info_no_username_found">No username found</string>
     <string name="delete_your_account">Delete your account</string>
+    <string name="message_confirm_delete_account">Do you really want to delete your account ?</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

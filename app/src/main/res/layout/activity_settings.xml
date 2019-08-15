@@ -13,11 +13,13 @@
 
     <com.google.android.material.button.MaterialButton
             android:id="@+id/activity_settings_delete_account_button"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/colorSecondary"
             android:textColor="@color/textColorPrimarySecondary"
             android:textSize="24sp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
             android:padding="10dp"
             android:layout_gravity="center"
             android:layout_margin="36dp"
