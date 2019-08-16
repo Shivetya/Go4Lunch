@@ -2,11 +2,9 @@ package com.gt.go4lunch.activities
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
-import com.firebase.ui.auth.data.model.User
 import com.google.android.material.snackbar.Snackbar
 import com.gt.go4lunch.R
 import kotlinx.android.synthetic.main.activity_main.*
