@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
 import com.gt.go4lunch.R
+import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 import kotlinx.android.synthetic.main.activity_logged.*
 import kotlinx.android.synthetic.main.nav_header_logged.view.*
 
@@ -21,11 +22,22 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val usersFirestoreUseCase = UsersFirestoreUseCase()
+
         setContentView(R.layout.activity_logged)
 
         configureToolbarAndDrawer()
 
         updateUIWithUsersInfo()
+
+        createUserInFirestoreIfDoesntExist(usersFirestoreUseCase)
+
+    }
+
+    override fun onDestroy() {
+        logoutUser()
+        super.onDestroy()
     }
 
     override fun onResume() {
@@ -135,4 +147,18 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
             .signOut(this)
             .addOnSuccessListener(this, this.updateUIAfterRequestsCompleted(LOGOUT_USER_TASK))
     }
+
+    private fun createUserInFirestoreIfDoesntExist(usersFirestoreUseCase: UsersFirestoreUseCase){
+
+        val username = getCurrentUser()?.displayName
+        val userID = getCurrentUser()?.uid!!
+        val userPicture = if (getCurrentUser()?.photoUrl != null){
+            getCurrentUser()?.photoUrl.toString()
+        } else {
+            null
+        }
+
+        usersFirestoreUseCase.setUserWithMerge(userID, username, userPicture).addOnFailureListener(this.onFailureListener())
+    }
+
 }

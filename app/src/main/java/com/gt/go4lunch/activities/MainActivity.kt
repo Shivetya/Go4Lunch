@@ -2,14 +2,16 @@ package com.gt.go4lunch.activities
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import com.gt.go4lunch.R
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : UserActivity() {
+class MainActivity : AppCompatActivity() {
 
     companion object{
         private const val ID_ACTIVITY_SIGN_IN = 1
@@ -27,7 +29,7 @@ class MainActivity : UserActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (isUserLogged()){
+        if (FirebaseAuth.getInstance().currentUser != null){
             startLoggedActivity()
         }
     }

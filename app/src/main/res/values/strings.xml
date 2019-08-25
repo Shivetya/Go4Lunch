@@ -31,5 +31,10 @@
     <string name="message_confirm_delete_account">Do you really want to delete your account ?</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
+    <string name="unknow_error">Unknow error</string>
+    <string name="new_username">New UserName</string>
+    <string name="update">Update</string>
+    <string name="error_email_not_found">Email Not Found</string>
+    <string name="logout">Logout</string>
 
 </resources>

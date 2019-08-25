@@ -15,11 +15,11 @@
         <item
                 android:id="@+id/nav_drawer_settings"
                 android:icon="@drawable/ic_settings_black_18dp"
-                android:title="@string/menu_tools"/>
+                android:title="@string/action_settings"/>
         <item
                 android:id="@+id/nav_drawer_logout"
                 android:icon="@drawable/ic_power_settings_new_black_24dp"
-                android:title="@string/menu_slideshow"/>
+                android:title="@string/logout"/>
     </group>
 
 </menu>
