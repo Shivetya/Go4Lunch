@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         activity_main_button_login_mail.setOnClickListener {
-            this.startLoginByMailActivity()
+            this.startLoginActivity()
         }
     }
 
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         handleWithActivityResult(requestCode, resultCode, data)
     }
 
-    private fun startLoginByMailActivity(){
+    private fun startLoginActivity(){
 
         startActivityForResult(AuthUI.getInstance()
             .createSignInIntentBuilder()

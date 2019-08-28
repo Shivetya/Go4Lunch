@@ -1,14 +1,14 @@
 package com.gt.go4lunch.usecases
 
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.gt.go4lunch.models.User
-import kotlinx.coroutines.runBlocking
-import java.lang.Exception
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 class UsersFirestoreUseCase {
 
@@ -20,15 +20,21 @@ class UsersFirestoreUseCase {
         return FirebaseFirestore.getInstance().collection(COLLECTION_NAME)
     }
 
-    fun setUserWithMerge(
+    fun setUserIfDoesntExist(
         userID: String,
         userName: String?,
         urlProfilePicture: String?
-    ): Task<Void> {
+    ): Task<DocumentSnapshot>? {
 
         val userToSet = User(userID, userName, urlProfilePicture)
 
-        return getUsersCollection().document(userID).set(userToSet, SetOptions.mergeFields("urlProfilePicture"))
+        return getUser(userID).addOnSuccessListener {
+            if (!it.exists() || it == null) {
+                getUsersCollection().document(userID).set(userToSet)
+            }
+        }.addOnFailureListener {
+            Log.w(javaClass.simpleName, "Couldn't reach Database.")
+        }
     }
 
     fun getUser(userID: String): Task<DocumentSnapshot> {

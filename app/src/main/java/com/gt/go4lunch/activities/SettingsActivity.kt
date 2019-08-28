@@ -6,7 +6,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import com.firebase.ui.auth.AuthUI
 import com.gt.go4lunch.R
-import com.gt.go4lunch.models.User
 import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 import kotlinx.android.synthetic.main.activity_settings.*
 

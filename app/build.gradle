@@ -38,6 +38,7 @@ android {
 
 dependencies {
     def work_version = "2.2.0"
+    def googlePlayVersion = "17.0.0"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Kotlin - Android
@@ -48,6 +49,10 @@ dependencies {
     // Kotlin - Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+
+    //GoogleMap
+    implementation "com.google.android.gms:play-services-maps:$googlePlayVersion"
+    implementation "com.google.android.gms:play-services-location:$googlePlayVersion"
 
     //WorkManager
     implementation "androidx.work:work-runtime-ktx:$work_version"
@@ -79,16 +84,15 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:21.0.0'
 
     //facebook
-    //noinspection GradleDependency
-    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
+    implementation 'com.facebook.android:facebook-android-sdk:5.4.0'
 
     //twitter
     implementation 'com.twitter.sdk.android:twitter-core:3.1.1'
 
     //Glide
-    implementation 'com.github.bumptech.glide:glide:4.4.0'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    kapt 'com.github.bumptech.glide:compiler:4.4.0'
+    kapt 'com.github.bumptech.glide:compiler:4.9.0'
 
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
     testImplementation 'junit:junit:4.12'
