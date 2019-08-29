@@ -10,7 +10,7 @@
         tools:openDrawer="start"
         tools:context=".activities.LoggedActivity">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -18,7 +18,23 @@
         <include
                 layout="@layout/toolbar"/>
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+        <FrameLayout
+                android:id="@+id/activity_logged_frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/activity_logged_bottom_nav"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:itemBackground="@color/colorPrimary"
+                app:menu="@menu/activity_logged_bottom_nav"
+                app:itemTextColor="@color/textColorPrimarySecondary"
+                android:layout_gravity="bottom"
+                app:itemIconTint="@color/textColorPrimarySecondary"/>
+
+    </LinearLayout>
 
 
 
