@@ -24,9 +24,8 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
     private lateinit var loggedViewModel : LoggedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         loggedViewModel = ViewModelProviders.of(this, ViewModelFactory.INSTANCE).get(LoggedViewModel::class.java)
+        super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_logged)
 
@@ -143,7 +142,10 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
     private fun logoutUser(){
         AuthUI.getInstance()
             .signOut(this)
-            .addOnSuccessListener(this, this.updateUIAfterRequestsCompleted(LOGOUT_USER_TASK))
+            .addOnSuccessListener{
+                startMainActivity()
+                finish()
+            }
     }
 
 }

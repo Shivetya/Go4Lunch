@@ -6,6 +6,7 @@ import android.os.PersistableBundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -14,16 +15,26 @@ import com.gt.go4lunch.R
 import com.gt.go4lunch.models.User
 import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 import kotlinx.android.synthetic.main.activity_settings.*
+import java.util.*
 
 abstract class UserActivity : AppCompatActivity() {
 
     companion object{
         const val DELETE_USER_TASK = 10
-        const val LOGOUT_USER_TASK = 20
-        const val UPDATE_USER_NAME = 30
+        const val UPDATE_USER_NAME = 20
     }
 
-    private val usersFirestoreUseCase: UsersFirestoreUseCase = UsersFirestoreUseCase()
+    protected val observerUserTaskSucceed = androidx.lifecycle.Observer<Int> {
+        when(it){
+            DELETE_USER_TASK -> {
+                startMainActivity()
+                finish()
+            }
+            UPDATE_USER_NAME -> {
+                activity_settings_progress_bar.visibility = View.GONE
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
 
@@ -57,53 +68,8 @@ abstract class UserActivity : AppCompatActivity() {
         return this.getCurrentUser() != null
     }
 
-    protected fun updateUIAfterRequestsCompleted(task: Int): OnSuccessListener<Void> {
-        return OnSuccessListener {
-            when (task){
-                DELETE_USER_TASK -> {
-                    startMainActivity()
-                    finish()
-                }
-                LOGOUT_USER_TASK -> {
-                    startMainActivity()
-                    finish()
-                }
-                UPDATE_USER_NAME -> {
-                    setUsernameInTextView()
-                    activity_settings_progress_bar.visibility = View.GONE
-                }
-            }
-        }
-    }
-
     private fun startMainActivity(){
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
-    }
-
-    protected fun onFailureListener(): OnFailureListener {
-        return OnFailureListener {
-            Toast.makeText(
-                applicationContext,
-                getString(R.string.unknow_error),
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-
-    protected fun setUsernameInTextView(){
-
-        val userID = getCurrentUser()?.uid
-
-        if (userID != null){
-            usersFirestoreUseCase.getUser(userID).addOnSuccessListener {
-                val currentUser: User? = it.toObject(User::class.java)
-
-                val userName = currentUser?.userName ?: getString(R.string.info_no_username_found)
-
-                activity_settings_username_textview.text = userName
-            }
-        }
-
     }
 }

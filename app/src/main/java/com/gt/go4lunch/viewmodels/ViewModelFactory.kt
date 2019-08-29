@@ -12,6 +12,7 @@ class ViewModelFactory private constructor(private val usersFirestoreUseCase: Us
 
         return when {
             modelClass.isAssignableFrom(LoggedViewModel::class.java) -> LoggedViewModel(usersFirestoreUseCase) as T
+            modelClass.isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(usersFirestoreUseCase) as T
             else -> throw IllegalArgumentException("Wrong UseCase Parameter")
         }
     }

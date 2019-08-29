@@ -1,55 +1,56 @@
 package com.gt.go4lunch.activities
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.firebase.ui.auth.AuthUI
 import com.gt.go4lunch.R
-import com.gt.go4lunch.usecases.UsersFirestoreUseCase
+import com.gt.go4lunch.viewmodels.SettingsViewModel
+import com.gt.go4lunch.viewmodels.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : UserActivity() {
 
-
+    private lateinit var settingsViewModel: SettingsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        settingsViewModel = ViewModelProviders.of(this, ViewModelFactory.INSTANCE).get(SettingsViewModel::class.java)
         super.onCreate(savedInstanceState)
-
-        val usersFirestoreUseCase = UsersFirestoreUseCase()
 
         setContentView(R.layout.activity_settings)
         configureToolbar()
         setUsernameInTextView()
 
-        configureDeleteAccountButton(usersFirestoreUseCase)
-        configureUpdateUsernameButtonAndEditText(usersFirestoreUseCase)
+        configureDeleteAccountButton()
+        configureUpdateUsernameButtonAndEditText()
 
     }
 
-    private fun configureDeleteAccountButton(usersFirestoreUseCase: UsersFirestoreUseCase){
+    private fun configureDeleteAccountButton(){
 
         activity_settings_delete_account_button.setOnClickListener {
             AlertDialog.Builder(this)
                 .setMessage(getString(R.string.message_confirm_delete_account))
                 .setPositiveButton(getString(R.string.yes)) { _, _ ->
                     deleteUserFromFirebase()
-                    deleteUserFromFirestore(usersFirestoreUseCase)
+                    deleteUserFromFirestore()
                 }
                 .setNegativeButton(getString(R.string.cancel), null)
                 .show()
         }
     }
 
-    private fun configureUpdateUsernameButtonAndEditText(usersFirestoreUseCase: UsersFirestoreUseCase){
+    private fun configureUpdateUsernameButtonAndEditText(){
 
         activity_settings_button_update.setOnClickListener {
 
             val newUserName: String? = activity_settings_edittext_new_username.text.toString()
 
-            if (!newUserName.isNullOrEmpty()){
-                updateUsernameInFirestore(usersFirestoreUseCase, newUserName)
-            }
+            updateUsernameInFirestore(newUserName)
         }
     }
 
@@ -57,7 +58,9 @@ class SettingsActivity : UserActivity() {
         if(this.getCurrentUser() != null){
             AuthUI.getInstance()
                 .delete(this)
-                .addOnSuccessListener(this, this.updateUIAfterRequestsCompleted(DELETE_USER_TASK))
+                .addOnFailureListener {
+                    Log.w(javaClass.simpleName, "Could not delete user in Firebase. $it")
+                }
         }
     }
 
@@ -69,26 +72,34 @@ class SettingsActivity : UserActivity() {
         actionBar?.setDefaultDisplayHomeAsUpEnabled(true)
     }
 
-    private fun deleteUserFromFirestore(usersFirestoreUseCase: UsersFirestoreUseCase){
+    private fun deleteUserFromFirestore(){
 
-        val userID = getCurrentUser()?.uid
-
-        if(userID != null) {
-            usersFirestoreUseCase.deleteUser(userID).addOnFailureListener(onFailureListener())
-        }
+        settingsViewModel.deleteUserInFirestore()
     }
 
-    private fun updateUsernameInFirestore(usersFirestoreUseCase: UsersFirestoreUseCase, newUsername: String){
+    private fun updateUsernameInFirestore(newUsername: String?){
 
         activity_settings_progress_bar.visibility = View.VISIBLE
 
-        val userID: String? = getCurrentUser()?.uid
+        settingsViewModel.updateUsernameInFirestore(newUsername)
 
-        if (userID != null) {
-            usersFirestoreUseCase
-                .updateUserName(userID, newUsername)
-                .addOnFailureListener(onFailureListener())
-                .addOnSuccessListener(this.updateUIAfterRequestsCompleted(UPDATE_USER_NAME))
+        settingsViewModel.isOperationSucceed.observe(this, observerUserTaskSucceed.also {
+            setUsernameInTextView(newUsername)
+        })
+
+
+
+    }
+
+    fun setUsernameInTextView(newUsername: String? = null){
+
+        if (newUsername == null){
+            settingsViewModel.usernameToSet.observe(this, Observer {
+                activity_settings_username_textview.text = it
+            })
+            settingsViewModel.getUsernameForTextView()
+        } else {
+            activity_settings_username_textview.text = newUsername
         }
 
     }
