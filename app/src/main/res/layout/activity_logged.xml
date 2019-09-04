@@ -22,7 +22,9 @@
                 android:id="@+id/activity_logged_frame_layout"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1">
+
+        </FrameLayout>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/activity_logged_bottom_nav"

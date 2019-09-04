@@ -5,7 +5,6 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
-    //noinspection GradleDependency
     buildToolsVersion "29.0.0"
     defaultConfig {
         applicationId "com.gt.go4lunch"
@@ -38,7 +37,6 @@ android {
 
 dependencies {
     def work_version = "2.2.0"
-    def googlePlayVersion = "17.0.0"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Kotlin - Android
@@ -47,12 +45,12 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
 
     // Kotlin - Coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.2"
 
     //GoogleMap
-    implementation "com.google.android.gms:play-services-maps:$googlePlayVersion"
-    implementation "com.google.android.gms:play-services-location:$googlePlayVersion"
+    implementation "com.google.android.gms:play-services-maps:17.0.0"
+    implementation "com.google.android.gms:play-services-location:17.0.0"
 
     //WorkManager
     implementation "androidx.work:work-runtime-ktx:$work_version"
@@ -80,7 +78,7 @@ dependencies {
 
     // Firebase
     implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
-    implementation 'com.google.firebase:firebase-core:17.1.0'
+    implementation 'com.google.firebase:firebase-core:17.2.0'
     implementation 'com.google.firebase:firebase-firestore:21.0.0'
 
     //facebook
@@ -96,7 +94,7 @@ dependencies {
 
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
     testImplementation 'junit:junit:4.12'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.2'
     testImplementation 'androidx.arch.core:core-testing:2.0.1'
     testImplementation "org.robolectric:robolectric:4.2.1"
     testImplementation 'androidx.test:core:1.2.0'

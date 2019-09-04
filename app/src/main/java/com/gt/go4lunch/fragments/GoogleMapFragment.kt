@@ -1,26 +1,25 @@
 package com.gt.go4lunch.fragments
 
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+class GoogleMapFragment: SupportMapFragment(), OnMapReadyCallback {
 
-import com.gt.go4lunch.R
+    private lateinit var map: GoogleMap
 
-/**
- * A simple [Fragment] subclass.
- */
-class GoogleMapFragment : Fragment() {
+    companion object{
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_google_map, container, false)
+        fun newInstance(): GoogleMapFragment{
+            return GoogleMapFragment()
+        }
+
     }
 
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+
+
+    }
 
 }

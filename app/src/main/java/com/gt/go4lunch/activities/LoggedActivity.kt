@@ -14,10 +14,12 @@ import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.gt.go4lunch.R
+import com.gt.go4lunch.fragments.GoogleMapFragment
 import com.gt.go4lunch.viewmodels.LoggedViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_logged.*
 import kotlinx.android.synthetic.main.nav_header_logged.view.*
+import kotlinx.android.synthetic.main.toolbar.*
 
 class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -34,6 +36,8 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         updateUIWithUsersInfo()
 
         loggedViewModel.createUserInFirestoreIfDoesntExist()
+
+        launchGoogleMapFragment()
 
     }
 
@@ -61,9 +65,7 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
@@ -71,19 +73,23 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
-        when (item.itemId) {
-            R.id.nav_home -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
 
-            }
+        when (item.itemId) {
+
             R.id.nav_drawer_settings -> {
                 startSettingsActivity()
             }
             R.id.nav_drawer_logout -> {
                 logoutUser()
+            }
+            R.id.menu_bottom_nav_map -> {
+                launchGoogleMapFragment()
+            }
+            R.id.menu_bottom_nav_list -> {
+
+            }
+            R.id.menu_bottom_nav_workmates -> {
+
             }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -104,6 +110,7 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         toggle.syncState()
 
         navView.setNavigationItemSelectedListener(this)
+        activity_toolbar.title = getString(R.string.i_am_hungry)
     }
 
     private fun updateUIWithUsersInfo(){
@@ -147,5 +154,13 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
                 finish()
             }
     }
+
+    private fun launchGoogleMapFragment(){
+
+        val googleMapFragment = GoogleMapFragment.newInstance()
+
+        supportFragmentManager.beginTransaction().replace(R.id.activity_logged_frame_layout, googleMapFragment).commit()
+    }
+
 
 }
