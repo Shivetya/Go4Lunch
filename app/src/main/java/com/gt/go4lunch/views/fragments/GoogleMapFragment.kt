@@ -1,4 +1,4 @@
-package com.gt.go4lunch.fragments
+package com.gt.go4lunch.views.fragments
 
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback

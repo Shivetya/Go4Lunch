@@ -1,4 +1,4 @@
-package com.gt.go4lunch.activities
+package com.gt.go4lunch.views.activities
 
 import android.os.Bundle
 import android.util.Log

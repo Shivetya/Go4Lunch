@@ -1,21 +1,13 @@
-package com.gt.go4lunch.activities
+package com.gt.go4lunch.views.activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.LiveData
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.android.gms.tasks.OnFailureListener
-import com.gt.go4lunch.R
-import com.gt.go4lunch.models.User
-import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 import kotlinx.android.synthetic.main.activity_settings.*
-import java.util.*
 
 abstract class UserActivity : AppCompatActivity() {
 

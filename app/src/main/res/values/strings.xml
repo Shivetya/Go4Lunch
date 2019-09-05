@@ -41,5 +41,15 @@
     <string name="workmates">Workmates</string>
     <string name="i_am_hungry">I\'m Hungry !</string>
     <string name="title_activity_maps">Map</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="third_star">Third star</string>
+    <string name="second_star">second star</string>
+    <string name="first_star">First star</string>
+    <string name="_42">(42)</string>
+    <string name="_232m">232m</string>
+    <string name="image_of_restaurant">Image of Restaurant</string>
+    <string name="open_until_2pm">Open until 2pm</string>
+    <string name="this_is_an_address_for_a_restaurant">This is an address for a restaurant</string>
+    <string name="restaurant_name_here">Restaurant name here</string>
 
 </resources>

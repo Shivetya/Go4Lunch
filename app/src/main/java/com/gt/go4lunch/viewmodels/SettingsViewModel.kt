@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.gt.go4lunch.activities.UserActivity
+import com.gt.go4lunch.views.activities.UserActivity
 import com.gt.go4lunch.models.User
 import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 

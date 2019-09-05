@@ -1,4 +1,4 @@
-package com.gt.go4lunch.activities
+package com.gt.go4lunch.views.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,7 +14,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.gt.go4lunch.R
-import com.gt.go4lunch.fragments.GoogleMapFragment
+import com.gt.go4lunch.views.fragments.GoogleMapFragment
 import com.gt.go4lunch.viewmodels.LoggedViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_logged.*

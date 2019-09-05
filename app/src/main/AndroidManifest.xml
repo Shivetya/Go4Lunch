@@ -22,12 +22,12 @@
                 android:value="AIzaSyBFW3Nex_BK6xrra4taD3xKMXcJ0SdM700" />
 
         <activity
-                android:name=".activities.SettingsActivity"
-                android:parentActivityName=".activities.LoggedActivity"/>
+                android:name="com.gt.go4lunch.views.activities.SettingsActivity"
+                android:parentActivityName="com.gt.go4lunch.views.activities.LoggedActivity"/>
         <activity
-                android:name=".activities.LoggedActivity"
+                android:name="com.gt.go4lunch.views.activities.LoggedActivity"
                 android:label="@string/title_activity_logged"/>
-        <activity android:name=".activities.MainActivity">
+        <activity android:name="com.gt.go4lunch.views.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
