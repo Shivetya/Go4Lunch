@@ -7,9 +7,9 @@ class Location {
 
     @SerializedName("lat")
     @Expose
-    var lat: Double? = null
+    var lat: Float? = null
     @SerializedName("lng")
     @Expose
-    var lng: Double? = null
+    var lng: Float? = null
 
 }
