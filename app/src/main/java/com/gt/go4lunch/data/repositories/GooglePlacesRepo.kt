@@ -4,5 +4,5 @@ import com.gt.go4lunch.data.PlacesSearchApiResponse
 
 interface GooglePlacesRepo {
 
-    fun getNearbyRestaurants(): PlacesSearchApiResponse
+    fun getNearbyRestaurants(location: String): PlacesSearchApiResponse?
 }

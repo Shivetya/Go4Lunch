@@ -22,4 +22,8 @@ class GoogleMapFragment: SupportMapFragment(), OnMapReadyCallback {
 
     }
 
+    private fun setObserve(){
+
+    }
+
 }

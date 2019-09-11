@@ -14,9 +14,9 @@ import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.gt.go4lunch.R
-import com.gt.go4lunch.views.fragments.GoogleMapFragment
 import com.gt.go4lunch.viewmodels.LoggedViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
+import com.gt.go4lunch.views.fragments.GoogleMapFragment
 import kotlinx.android.synthetic.main.activity_logged.*
 import kotlinx.android.synthetic.main.nav_header_logged.view.*
 import kotlinx.android.synthetic.main.toolbar.*
