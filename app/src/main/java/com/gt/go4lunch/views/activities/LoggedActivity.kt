@@ -1,11 +1,14 @@
 package com.gt.go4lunch.views.activities
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProviders
@@ -13,6 +16,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.gt.go4lunch.R
 import com.gt.go4lunch.viewmodels.LoggedViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
@@ -37,6 +41,12 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
 
         loggedViewModel.createUserInFirestoreIfDoesntExist()
 
+        val locationEnabled = checkLocationAccessGranted()
+
+
+        loggedViewModel.startLocationUpdate(locationEnabled)
+
+
         launchGoogleMapFragment()
 
     }
@@ -47,6 +57,17 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         if (!isUserLogged()) {
             startMainActivity()
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        FirebaseAuth.getInstance().signOut()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        loggedViewModel.stopLocationUpdate()
     }
 
     override fun onBackPressed() {
@@ -160,6 +181,29 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         val googleMapFragment = GoogleMapFragment.newInstance()
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_logged_frame_layout, googleMapFragment).commit()
+    }
+
+    private fun checkLocationAccessGranted(): Boolean{
+
+        val permissionAccessCoarseLocationApproved = ActivityCompat
+            .checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+
+        val permissionAccessFineLocationApproved = ActivityCompat
+            .checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+
+        if (!permissionAccessCoarseLocationApproved || !permissionAccessFineLocationApproved){
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_COARSE_LOCATION)
+
+            checkLocationAccessGranted()
+        } else {
+            return true
+        }
+
+        return true
     }
 
 
