@@ -14,7 +14,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.gt.go4lunch.R
-import com.gt.go4lunch.data.repositories.LocationRepoImpl
+import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
 
 class GoogleMapFragment: Fragment(), OnMapReadyCallback {
 

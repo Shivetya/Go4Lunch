@@ -3,7 +3,7 @@ package com.gt.go4lunch.viewmodels
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.gt.go4lunch.data.repositories.LocationRepo
+import com.gt.go4lunch.data.repositories.location.LocationRepo
 import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 
 class LoggedViewModel(private val usersFirestoreUseCase: UsersFirestoreUseCase, private val locationRepo: LocationRepo): ViewModel() {

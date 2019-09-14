@@ -1,4 +1,65 @@
 package com.gt.go4lunch.usecases
 
-class ListRestaurantsUseCase {
+import android.location.Location
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import com.gt.go4lunch.data.repositories.places.GooglePlacesCacheRepo
+import com.gt.go4lunch.models.Restaurant
+import kotlinx.coroutines.*
+
+class ListRestaurantsUseCase(private val placesCacheRepo: GooglePlacesCacheRepo) {
+
+    private val _listRestaurants: MutableLiveData<List<Restaurant>> = MutableLiveData()
+    val listRestaurants: LiveData<List<Restaurant>> = _listRestaurants
+
+    var currentJob: Job? = null
+
+    fun getListRestaurant(location: Location){
+
+        val locationQueryReady = transformLocationQueryReady(location)
+
+        cancelJobIfActive()
+
+        currentJob = GlobalScope.launch(Dispatchers.IO){
+            fetchListRestaurants(locationQueryReady)
+        }
+
+    }
+
+    @VisibleForTesting
+    suspend fun fetchListRestaurants(location: String){
+
+        val listRestaurant = placesCacheRepo.getListRestaurants(location)
+            ?.results?.map{
+
+            Restaurant(it.name,
+                it.icon,
+                it.vicinity,
+                it.openingHours?.openNow,
+                listOf(it.geometry?.location?.lat, it.geometry?.location?.lng),
+                it.types)
+        }
+
+        withContext(Dispatchers.Main){
+            _listRestaurants.value = listRestaurant
+        }
+    }
+
+    @VisibleForTesting
+    fun transformLocationQueryReady(locationToTransform: Location): String{
+        val lat = locationToTransform.latitude
+        val lng = locationToTransform.longitude
+
+        return "location=$lat,$lng"
+    }
+
+    private fun cancelJobIfActive(){
+
+        currentJob?.let {
+            if(it.isActive){
+                it.cancel()
+            }
+        }
+    }
 }

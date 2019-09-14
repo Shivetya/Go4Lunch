@@ -1,4 +1,4 @@
-package com.gt.go4lunch.data.repositories
+package com.gt.go4lunch.data.repositories.places
 
 import com.gt.go4lunch.data.PlacesSearchApiResponse
 import com.gt.go4lunch.utils.TLSSocketFactory
@@ -44,9 +44,18 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
                 var request = chain.request()
                 val url = request.url()
                     .newBuilder()
-                    .addQueryParameter(RADIUS_NAME, RADIUS_VALUE)
-                    .addQueryParameter(TYPE_NAME, TYPE_VALUE)
-                    .addQueryParameter(KEY_NAME, API_KEY )
+                    .addQueryParameter(
+                        RADIUS_NAME,
+                        RADIUS_VALUE
+                    )
+                    .addQueryParameter(
+                        TYPE_NAME,
+                        TYPE_VALUE
+                    )
+                    .addQueryParameter(
+                        KEY_NAME,
+                        API_KEY
+                    )
                     .build()
                 request = request.newBuilder().url(url).build()
                 chain.proceed(request)
@@ -67,7 +76,8 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
-            serviceNearbyRestaurant = retrofit.create(GooglePlacesApi::class.java)
+            serviceNearbyRestaurant = retrofit.create(
+                GooglePlacesApi::class.java)
         }
     }
 

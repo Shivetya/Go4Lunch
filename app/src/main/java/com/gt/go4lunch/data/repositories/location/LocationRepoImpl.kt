@@ -1,4 +1,4 @@
-package com.gt.go4lunch.data.repositories
+package com.gt.go4lunch.data.repositories.location
 
 import android.app.Application
 import android.location.Location
@@ -12,7 +12,8 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.gt.go4lunch.MainApplication
 
-class LocationRepoImpl private constructor(app: Application): LocationRepo {
+class LocationRepoImpl private constructor(app: Application):
+    LocationRepo {
 
     companion object {
         val instance: LocationRepo by lazy {

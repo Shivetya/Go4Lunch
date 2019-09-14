@@ -1,33 +1,39 @@
-package com.gt.go4lunch.repotests
+package com.gt.go4lunch.usecasestests
 
 import android.content.Context
 import android.content.res.Resources
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.gt.go4lunch.data.*
-import com.gt.go4lunch.data.repositories.GooglePlacesRepo
+import com.gt.go4lunch.data.repositories.places.GooglePlacesCacheRepo
 import com.gt.go4lunch.testutils.CoroutinesTestRules
-import junit.framework.Assert.assertTrue
+import com.gt.go4lunch.usecases.ListRestaurantsUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import net.danlew.android.joda.JodaTimeAndroid
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import org.robolectric.RobolectricTestRunner
 import java.io.InputStream
 
 @ExperimentalCoroutinesApi
-class GooglePlacesMappingRepositoryTest {
+@RunWith(RobolectricTestRunner::class)
+class ListRestaurantsUseCaseTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
+
     @get:Rule
     var coroutinesTestRule = CoroutinesTestRules()
 
-    private lateinit var googlePlacesRepo: GooglePlacesRepo
+    private lateinit var googlePlacesCacheRepo: GooglePlacesCacheRepo
+    private val loc = android.location.Location("TestLoc")
 
     val googlePlacesResponse: PlacesSearchApiResponse = PlacesSearchApiResponse().apply {
         results = listOf(Result().apply {
@@ -63,8 +69,9 @@ class GooglePlacesMappingRepositoryTest {
 
     @Before
     fun setRepo(){
-        googlePlacesRepo = object :GooglePlacesRepo{
-            override fun getNearbyRestaurants(): PlacesSearchApiResponse = googlePlacesResponse
+        googlePlacesCacheRepo = object :
+            GooglePlacesCacheRepo {
+            override fun getListRestaurants(location: String): PlacesSearchApiResponse = googlePlacesResponse
         }
     }
 
@@ -88,12 +95,12 @@ class GooglePlacesMappingRepositoryTest {
         googlePlacesResponse.results?.get(0)?.apply {
             name = "Bonjour"
         }
-        val googlePlacesMappingRepo = GooglePlacesMappingRepository(googlePlacesRepo)
+        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
 
-        googlePlacesMappingRepo.fetchNearbyRestaurants()
+        listRestaurantsUseCase.fetchListRestaurants("")
 
         //then
-        Assert.assertEquals("Bonjour", googlePlacesMappingRepo.restaurants.value?.get(0)?.name)
+        assertEquals("Bonjour", listRestaurantsUseCase.listRestaurants.value?.get(0)?.name)
     }
 
     @Test
@@ -102,12 +109,12 @@ class GooglePlacesMappingRepositoryTest {
         googlePlacesResponse.results?.get(0)?.apply {
             vicinity = "adresse"
         }
-        val googlePlacesMappingRepo = GooglePlacesMappingRepository(googlePlacesRepo)
+        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
 
-        googlePlacesMappingRepo.fetchNearbyRestaurants()
+        listRestaurantsUseCase.fetchListRestaurants("")
 
         //then
-        Assert.assertEquals("adresse", googlePlacesMappingRepo.restaurants.value?.get(0)?.address)
+        assertEquals("adresse", listRestaurantsUseCase.listRestaurants.value?.get(0)?.address)
     }
 
     @Test
@@ -116,12 +123,12 @@ class GooglePlacesMappingRepositoryTest {
         googlePlacesResponse.results?.get(0)?.apply {
             icon = "url de l'image"
         }
-        val googlePlacesMappingRepo = GooglePlacesMappingRepository(googlePlacesRepo)
+        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
 
-        googlePlacesMappingRepo.fetchNearbyRestaurants()
+        listRestaurantsUseCase.fetchListRestaurants("")
 
         //then
-        Assert.assertEquals("url de l'image", googlePlacesMappingRepo.restaurants.value?.get(0)?.urlPicture)
+        assertEquals("url de l'image", listRestaurantsUseCase.listRestaurants.value?.get(0)?.urlPicture)
     }
 
     @Test
@@ -132,12 +139,12 @@ class GooglePlacesMappingRepositoryTest {
                 openNow = true
             }
         }
-        val googlePlacesMappingRepo = GooglePlacesMappingRepository(googlePlacesRepo)
+        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
 
-        googlePlacesMappingRepo.fetchNearbyRestaurants()
+        listRestaurantsUseCase.fetchListRestaurants("")
 
         //then
-        assertTrue(googlePlacesMappingRepo.restaurants.value?.get(0)?.isOpen)
+        listRestaurantsUseCase.listRestaurants.value?.get(0)?.isOpen?.let { assertTrue(it) }
     }
 
     @Test
@@ -151,12 +158,12 @@ class GooglePlacesMappingRepositoryTest {
                 }
             }
         }
-        val googlePlacesMappingRepo = GooglePlacesMappingRepository(googlePlacesRepo)
+        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
 
-        googlePlacesMappingRepo.fetchNearbyRestaurants()
+        listRestaurantsUseCase.fetchListRestaurants("")
 
         //then
-        Assert.assertEquals(listOf(((-65413251.45864).toFloat()), 546541.165846F), googlePlacesMappingRepo.restaurants.value?.get(0)?.latLng)
+        assertEquals(listOf(((-65413251.45864).toFloat()), 546541.165846F), listRestaurantsUseCase.listRestaurants.value?.get(0)?.latLng)
     }
 
     @Test
@@ -165,12 +172,14 @@ class GooglePlacesMappingRepositoryTest {
         googlePlacesResponse.results?.get(0)?.apply {
             types = listOf("veggie")
         }
-        val googlePlacesMappingRepo = GooglePlacesMappingRepository(googlePlacesRepo)
+        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
 
-        googlePlacesMappingRepo.fetchNearbyRestaurants()
+        listRestaurantsUseCase.fetchListRestaurants("")
 
         //then
-        Assert.assertEquals("veggie", googlePlacesMappingRepo.restaurants.value?.get(0)?.types[0])
+        assertEquals("veggie",
+            listRestaurantsUseCase.listRestaurants.value?.get(0)?.types?.get(0)
+        )
     }
 
     @Test
@@ -179,12 +188,27 @@ class GooglePlacesMappingRepositoryTest {
         googlePlacesResponse.results?.get(1)?.apply {
             name = "second restaurant name here"
         }
-        val googlePlacesMappingRepo = GooglePlacesMappingRepository(googlePlacesRepo)
+        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
 
-        googlePlacesMappingRepo.fetchNearbyRestaurants()
+        listRestaurantsUseCase.fetchListRestaurants("")
 
         //then
-        Assert.assertEquals("second restaurant name here", googlePlacesMappingRepo.restaurants.value?.get(1)?.name)
+        assertEquals("second restaurant name here", listRestaurantsUseCase.listRestaurants.value?.get(1)?.name)
+    }
+
+    @Test
+    fun `should transform Location to string for query`(){
+
+        //given
+        loc.latitude = 6654.564
+        loc.longitude = 5643.68546
+
+        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+
+        val stringToTest = listRestaurantsUseCase.transformLocationQueryReady(loc)
+
+        //then
+        assertEquals("location=6654.564,5643.68546", stringToTest)
     }
 
 }

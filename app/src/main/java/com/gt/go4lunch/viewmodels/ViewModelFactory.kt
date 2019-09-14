@@ -2,14 +2,15 @@ package com.gt.go4lunch.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.gt.go4lunch.data.repositories.LocationRepo
-import com.gt.go4lunch.data.repositories.LocationRepoImpl
+import com.gt.go4lunch.data.repositories.location.LocationRepo
+import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
 import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 import java.lang.IllegalArgumentException
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory private constructor(private val usersFirestoreUseCase: UsersFirestoreUseCase,
-                                           private val locationRepo: LocationRepo): ViewModelProvider.Factory {
+                                           private val locationRepo: LocationRepo
+): ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
 
