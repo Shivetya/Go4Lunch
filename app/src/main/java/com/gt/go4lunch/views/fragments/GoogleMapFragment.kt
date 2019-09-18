@@ -15,6 +15,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.gt.go4lunch.R
 import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
+import com.gt.go4lunch.models.Restaurant
+import com.gt.go4lunch.usecases.GoogleListRestaurantsUseCase
 
 class GoogleMapFragment: Fragment(), OnMapReadyCallback {
 
@@ -47,17 +49,33 @@ class GoogleMapFragment: Fragment(), OnMapReadyCallback {
 
     private fun setObserve(){
         LocationRepoImpl.instance.getLocationLiveData().observe(this, Observer {
-            updateUI(it)
+            updateUILocation(it)
+        })
+
+        GoogleListRestaurantsUseCase.instance.listRestaurants.observe(this, Observer {
+            updateUIListRestaurants(it)
         })
     }
 
-    private fun updateUI(userLoc: Location){
+    private fun updateUILocation(userLoc: Location){
         val userLatLng = LatLng(userLoc.latitude, userLoc.longitude)
-
-        map.addMarker(MarkerOptions().position(userLatLng).title("User Location"))
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15F))
 
+    }
+
+    private fun updateUIListRestaurants(listRestaurants: Collection<Restaurant>){
+
+        for(restaurant in listRestaurants){
+            val lat = restaurant.latLng[0]
+            val lng = restaurant.latLng[1]
+
+            if (lat != null && lng != null){
+                val restaurantLoc = LatLng(lat, lng)
+                map.addMarker(MarkerOptions().position(restaurantLoc).title(restaurant.name))
+            }
+
+        }
     }
 
 }

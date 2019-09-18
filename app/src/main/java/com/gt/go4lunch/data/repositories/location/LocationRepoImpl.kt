@@ -37,7 +37,6 @@ class LocationRepoImpl private constructor(app: Application):
         if (isLocationEnabled){
             val locationRequest = LocationRequest()
                 .setInterval(5000)
-                .setFastestInterval(2000)
                 .setPriority(PRIORITY_BALANCED_POWER_ACCURACY)
 
             locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())

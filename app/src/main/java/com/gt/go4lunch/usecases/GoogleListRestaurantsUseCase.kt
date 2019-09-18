@@ -5,15 +5,22 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.gt.go4lunch.data.repositories.places.GooglePlacesCacheRepo
+import com.gt.go4lunch.data.repositories.places.GooglePlacesCacheRepoImpl
 import com.gt.go4lunch.models.Restaurant
 import kotlinx.coroutines.*
 
-class ListRestaurantsUseCase(private val placesCacheRepo: GooglePlacesCacheRepo) {
+class GoogleListRestaurantsUseCase(private val placesCacheRepo: GooglePlacesCacheRepo) {
 
     private val _listRestaurants: MutableLiveData<List<Restaurant>> = MutableLiveData()
     val listRestaurants: LiveData<List<Restaurant>> = _listRestaurants
 
     var currentJob: Job? = null
+
+    companion object{
+        val instance: GoogleListRestaurantsUseCase by lazy{
+            GoogleListRestaurantsUseCase(GooglePlacesCacheRepoImpl.instance)
+        }
+    }
 
     fun getListRestaurant(location: Location){
 
@@ -51,7 +58,7 @@ class ListRestaurantsUseCase(private val placesCacheRepo: GooglePlacesCacheRepo)
         val lat = locationToTransform.latitude
         val lng = locationToTransform.longitude
 
-        return "location=$lat,$lng"
+        return "$lat,$lng"
     }
 
     private fun cancelJobIfActive(){

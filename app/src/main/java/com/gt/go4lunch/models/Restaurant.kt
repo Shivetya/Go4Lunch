@@ -5,6 +5,6 @@ data class Restaurant(
     val urlPicture: String?,
     val address: String?,
     val isOpen: Boolean?,
-    val latLng: List<Float?>,
+    val latLng: List<Double?>,
     val types: List<String>?
 )

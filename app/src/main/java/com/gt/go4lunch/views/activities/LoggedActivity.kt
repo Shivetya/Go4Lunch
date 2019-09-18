@@ -3,6 +3,7 @@ package com.gt.go4lunch.views.activities
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,6 +12,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -18,16 +20,19 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.gt.go4lunch.R
+import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
 import com.gt.go4lunch.viewmodels.LoggedViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
 import com.gt.go4lunch.views.fragments.GoogleMapFragment
 import kotlinx.android.synthetic.main.activity_logged.*
 import kotlinx.android.synthetic.main.nav_header_logged.view.*
 import kotlinx.android.synthetic.main.toolbar.*
+import net.danlew.android.joda.JodaTimeAndroid
 
 class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var loggedViewModel : LoggedViewModel
+    private lateinit var userLoc: Location
 
     override fun onCreate(savedInstanceState: Bundle?) {
         loggedViewModel = ViewModelProviders.of(this, ViewModelFactory.INSTANCE).get(LoggedViewModel::class.java)
@@ -35,14 +40,16 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
 
         setContentView(R.layout.activity_logged)
 
+        JodaTimeAndroid.init(this)
         configureToolbarAndDrawer()
 
         updateUIWithUsersInfo()
 
         loggedViewModel.createUserInFirestoreIfDoesntExist()
 
-        val locationEnabled = checkLocationAccessGranted()
+        setObserveLocation()
 
+        val locationEnabled = checkLocationAccessGranted()
 
         loggedViewModel.startLocationUpdate(locationEnabled)
 
@@ -206,5 +213,10 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         return true
     }
 
+    private fun setObserveLocation(){
+        LocationRepoImpl.instance.getLocationLiveData().observe(this, Observer {
+            loggedViewModel.launchSearchNearbyRestaurant(it)
+        })
+    }
 
 }

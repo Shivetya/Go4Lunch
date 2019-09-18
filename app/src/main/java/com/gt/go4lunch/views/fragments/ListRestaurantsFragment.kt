@@ -17,7 +17,7 @@ import com.gt.go4lunch.viewmodels.ViewModelFactory
 class ListRestaurantsFragment : Fragment() {
 
     private lateinit var viewModel: ListRestaurantsViewModel
-    private lateinit var restaurants: MutableCollection<Restaurant>
+    //private lateinit var restaurants: MutableCollection<Restaurant>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,18 +32,9 @@ class ListRestaurantsFragment : Fragment() {
         return view
     }
 
-    private fun setObserve(){
-        viewModel.listRestaurantLiveData.observe(
-            this,
-            Observer {
-                updateUI(it)
-            }
-        )
-    }
+    /*private fun updateUI(restaurants: Collection<Restaurant>){
 
-    private fun updateUI(restaurants: Collection<Restaurant>){
-
-    }
+    }*/
 
 
 }

@@ -6,7 +6,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.gt.go4lunch.data.*
 import com.gt.go4lunch.data.repositories.places.GooglePlacesCacheRepo
 import com.gt.go4lunch.testutils.CoroutinesTestRules
-import com.gt.go4lunch.usecases.ListRestaurantsUseCase
+import com.gt.go4lunch.usecases.GoogleListRestaurantsUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import net.danlew.android.joda.JodaTimeAndroid
@@ -45,8 +45,8 @@ class ListRestaurantsUseCaseTest {
             icon = "url de l'image ici !!!"
             geometry = Geometry().apply {
                 location = Location().apply {
-                    lat = 16584.54654F
-                    lng = 3654.5754F
+                    lat = 16584.54654
+                    lng = 3654.5754
                 }
             }
             types = listOf("Veggie", "Vegan")
@@ -59,8 +59,8 @@ class ListRestaurantsUseCaseTest {
             icon = "Une deuxième url d'image"
             geometry = Geometry().apply {
                 location = Location().apply {
-                    lat = 496846521.4F
-                    lng = 68546151.6478F
+                    lat = 496846521.4
+                    lng = 68546151.6478
                 }
             }
             types = listOf("non Veggie", "non Vegan")
@@ -95,7 +95,7 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(0)?.apply {
             name = "Bonjour"
         }
-        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
         listRestaurantsUseCase.fetchListRestaurants("")
 
@@ -109,7 +109,7 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(0)?.apply {
             vicinity = "adresse"
         }
-        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
         listRestaurantsUseCase.fetchListRestaurants("")
 
@@ -123,7 +123,7 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(0)?.apply {
             icon = "url de l'image"
         }
-        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
         listRestaurantsUseCase.fetchListRestaurants("")
 
@@ -139,7 +139,7 @@ class ListRestaurantsUseCaseTest {
                 openNow = true
             }
         }
-        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
         listRestaurantsUseCase.fetchListRestaurants("")
 
@@ -153,17 +153,17 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(0)?.apply {
             geometry = Geometry().apply {
                 location = Location().apply {
-                    lat = (-65413251.45864).toFloat()
-                    lng = 546541.165846F
+                    lat = -65413251.45864
+                    lng = 546541.165846
                 }
             }
         }
-        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
         listRestaurantsUseCase.fetchListRestaurants("")
 
         //then
-        assertEquals(listOf(((-65413251.45864).toFloat()), 546541.165846F), listRestaurantsUseCase.listRestaurants.value?.get(0)?.latLng)
+        assertEquals(listOf((-65413251.45864), 546541.165846), listRestaurantsUseCase.listRestaurants.value?.get(0)?.latLng)
     }
 
     @Test
@@ -172,7 +172,7 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(0)?.apply {
             types = listOf("veggie")
         }
-        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
         listRestaurantsUseCase.fetchListRestaurants("")
 
@@ -188,7 +188,7 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(1)?.apply {
             name = "second restaurant name here"
         }
-        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
         listRestaurantsUseCase.fetchListRestaurants("")
 
@@ -203,7 +203,7 @@ class ListRestaurantsUseCaseTest {
         loc.latitude = 6654.564
         loc.longitude = 5643.68546
 
-        val listRestaurantsUseCase = ListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
         val stringToTest = listRestaurantsUseCase.transformLocationQueryReady(loc)
 

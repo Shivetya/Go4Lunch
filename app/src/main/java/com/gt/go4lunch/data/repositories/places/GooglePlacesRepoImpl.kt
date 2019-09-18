@@ -19,7 +19,7 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
         private var serviceNearbyRestaurant: GooglePlacesApi
 
         private const val KEY_NAME = "key"
-        private const val API_KEY = "AIzaSyBFW3Nex_BK6xrra4taD3xKMXcJ0SdM700"
+        private const val API_KEY = "AIzaSyBLn7zjb8LPaAbCfOMJHuYF8zAgZWNcncg"
 
         private const val TYPE_NAME = "type"
         private const val TYPE_VALUE = "restaurant"
