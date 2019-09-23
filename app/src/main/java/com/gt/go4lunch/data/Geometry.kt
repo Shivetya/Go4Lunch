@@ -7,6 +7,6 @@ class Geometry {
 
     @SerializedName("location")
     @Expose
-    var location: Location? = null
+    var location: Location = Location()
 
 }

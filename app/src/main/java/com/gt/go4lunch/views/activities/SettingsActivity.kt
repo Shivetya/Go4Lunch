@@ -84,23 +84,23 @@ class SettingsActivity : UserActivity() {
         settingsViewModel.updateUsernameInFirestore(newUsername)
 
         settingsViewModel.isOperationSucceed.observe(this, observerUserTaskSucceed.also {
-            setUsernameInTextView(newUsername)
+            setUsernameInTextView()
         })
 
 
 
     }
 
-    fun setUsernameInTextView(newUsername: String? = null){
+    //deplacer dans le viewModel
+    private fun setUsernameInTextView(){
 
-        if (newUsername == null){
-            settingsViewModel.usernameToSet.observe(this, Observer {
-                activity_settings_username_textview.text = it
-            })
-            settingsViewModel.getUsernameForTextView()
-        } else {
-            activity_settings_username_textview.text = newUsername
-        }
+
+        settingsViewModel.usernameToSet.observe(this, Observer {
+            activity_settings_username_textview.text = it
+        })
+
+        settingsViewModel.getUsernameForTextView()
+
 
     }
 

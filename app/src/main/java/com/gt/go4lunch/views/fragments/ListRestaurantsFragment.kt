@@ -16,6 +16,12 @@ import com.gt.go4lunch.viewmodels.ViewModelFactory
 
 class ListRestaurantsFragment : Fragment() {
 
+    companion object{
+        fun newInstance(): ListRestaurantsFragment{
+            return ListRestaurantsFragment()
+        }
+    }
+
     private lateinit var viewModel: ListRestaurantsViewModel
     //private lateinit var restaurants: MutableCollection<Restaurant>
 

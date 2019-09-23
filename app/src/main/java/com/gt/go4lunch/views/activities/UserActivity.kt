@@ -14,8 +14,7 @@ abstract class UserActivity : AppCompatActivity() {
     companion object{
         const val DELETE_USER_TASK = 10
         const val UPDATE_USER_NAME = 20
-        const val REQUEST_COARSE_LOCATION = 30
-        const val REQUEST_FINE_LOCATION = 40
+        const val REQUEST_LOCATION = 30
     }
 
     protected val observerUserTaskSucceed = androidx.lifecycle.Observer<Int> {

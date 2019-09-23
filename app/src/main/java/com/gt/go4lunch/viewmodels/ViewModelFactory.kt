@@ -16,9 +16,10 @@ class ViewModelFactory private constructor(private val usersFirestoreUseCase: Us
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
 
         return when {
-            modelClass.isAssignableFrom(LoggedViewModel::class.java) -> LoggedViewModel(usersFirestoreUseCase, locationRepo, googleListRestaurantsUseCase) as T
+            modelClass.isAssignableFrom(LoggedViewModel::class.java) -> LoggedViewModel(usersFirestoreUseCase, locationRepo) as T
             modelClass.isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(usersFirestoreUseCase) as T
             modelClass.isAssignableFrom(ListRestaurantsViewModel::class.java) -> ListRestaurantsViewModel(googleListRestaurantsUseCase) as T
+            modelClass.isAssignableFrom(GoogleMapViewModel::class.java) -> GoogleMapViewModel(googleListRestaurantsUseCase) as T
             else -> throw IllegalArgumentException("Wrong UseCase Parameter")
         }
     }

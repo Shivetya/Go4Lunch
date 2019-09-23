@@ -11,7 +11,9 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
         }
     }
 
-    override fun getListRestaurants(location: String): PlacesSearchApiResponse?{
+    override suspend fun getListRestaurants(location: String): PlacesSearchApiResponse?{
         return placesRepo.getNearbyRestaurants(location)
     }
+
+
 }

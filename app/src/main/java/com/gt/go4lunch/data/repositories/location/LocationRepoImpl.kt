@@ -20,6 +20,7 @@ class LocationRepoImpl private constructor(app: Application):
             LocationRepoImpl(MainApplication.getInstance())
         }
     }
+    private var isListeningToLocation = false
 
     private val locationLiveData: MutableLiveData<Location> = MutableLiveData()
 
@@ -33,10 +34,12 @@ class LocationRepoImpl private constructor(app: Application):
 
     override fun getLocationLiveData(): LiveData<Location> = locationLiveData
 
-    override fun beginSearchLocation(isLocationEnabled: Boolean) {
-        if (isLocationEnabled){
+    override fun beginSearchLocation() {
+        if (!isListeningToLocation){
+            isListeningToLocation = true
+
             val locationRequest = LocationRequest()
-                .setInterval(5000)
+                .setInterval(30_000)
                 .setPriority(PRIORITY_BALANCED_POWER_ACCURACY)
 
             locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())

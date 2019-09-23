@@ -5,6 +5,6 @@ import androidx.lifecycle.LiveData
 
 interface LocationRepo {
     fun getLocationLiveData(): LiveData<Location>
-    fun beginSearchLocation(isLocationEnabled: Boolean)
+    fun beginSearchLocation()
     fun stopLocationUpdate()
 }

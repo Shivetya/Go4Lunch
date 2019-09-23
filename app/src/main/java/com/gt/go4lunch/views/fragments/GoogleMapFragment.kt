@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -15,12 +16,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.gt.go4lunch.R
 import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
-import com.gt.go4lunch.models.Restaurant
-import com.gt.go4lunch.usecases.GoogleListRestaurantsUseCase
+import com.gt.go4lunch.models.RestaurantMarker
+import com.gt.go4lunch.viewmodels.GoogleMapViewModel
+import com.gt.go4lunch.viewmodels.ViewModelFactory
 
 class GoogleMapFragment: Fragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
+    private lateinit var mapViewModel: GoogleMapViewModel
 
     companion object{
 
@@ -33,6 +36,8 @@ class GoogleMapFragment: Fragment(), OnMapReadyCallback {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_google_map, container, false)
+
+        mapViewModel = ViewModelProviders.of(this, ViewModelFactory.INSTANCE).get(GoogleMapViewModel::class.java)
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.fragment_google_map_map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -52,9 +57,7 @@ class GoogleMapFragment: Fragment(), OnMapReadyCallback {
             updateUILocation(it)
         })
 
-        GoogleListRestaurantsUseCase.instance.listRestaurants.observe(this, Observer {
-            updateUIListRestaurants(it)
-        })
+        //TODO : Add observe to viewmodel for nearbyrestaurants.
     }
 
     private fun updateUILocation(userLoc: Location){
@@ -64,16 +67,15 @@ class GoogleMapFragment: Fragment(), OnMapReadyCallback {
 
     }
 
-    private fun updateUIListRestaurants(listRestaurants: Collection<Restaurant>){
+    private fun updateUIListRestaurantsMarkers(listRestaurants: Collection<RestaurantMarker>){
 
         for(restaurant in listRestaurants){
-            val lat = restaurant.latLng[0]
-            val lng = restaurant.latLng[1]
 
-            if (lat != null && lng != null){
-                val restaurantLoc = LatLng(lat, lng)
-                map.addMarker(MarkerOptions().position(restaurantLoc).title(restaurant.name))
-            }
+            val lat = restaurant.lat
+            val lng = restaurant.lng
+
+            val restaurantLoc = LatLng(lat, lng)
+            map.addMarker(MarkerOptions().position(restaurantLoc).title(restaurant.name))
 
         }
     }

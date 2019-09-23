@@ -3,7 +3,6 @@ package com.gt.go4lunch.views.activities
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,7 +11,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -20,10 +18,10 @@ import com.firebase.ui.auth.AuthUI
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.gt.go4lunch.R
-import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
 import com.gt.go4lunch.viewmodels.LoggedViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
 import com.gt.go4lunch.views.fragments.GoogleMapFragment
+import com.gt.go4lunch.views.fragments.ListRestaurantsFragment
 import kotlinx.android.synthetic.main.activity_logged.*
 import kotlinx.android.synthetic.main.nav_header_logged.view.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -32,7 +30,6 @@ import net.danlew.android.joda.JodaTimeAndroid
 class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var loggedViewModel : LoggedViewModel
-    private lateinit var userLoc: Location
 
     override fun onCreate(savedInstanceState: Bundle?) {
         loggedViewModel = ViewModelProviders.of(this, ViewModelFactory.INSTANCE).get(LoggedViewModel::class.java)
@@ -47,12 +44,9 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
 
         loggedViewModel.createUserInFirestoreIfDoesntExist()
 
-        setObserveLocation()
+        checkLocationAccessGranted()
 
-        val locationEnabled = checkLocationAccessGranted()
-
-        loggedViewModel.startLocationUpdate(locationEnabled)
-
+        loggedViewModel.startLocationUpdate()
 
         launchGoogleMapFragment()
 
@@ -114,7 +108,7 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
                 launchGoogleMapFragment()
             }
             R.id.menu_bottom_nav_list -> {
-
+                launchListRestaurantsFragment()
             }
             R.id.menu_bottom_nav_workmates -> {
 
@@ -149,9 +143,10 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
 
             val user = this.getCurrentUser()
 
-            if(user?.photoUrl != null){
+            user?.photoUrl?.let{
+
                 Glide.with(this)
-                    .load(user.photoUrl)
+                    .load(it)
                     .apply(RequestOptions.circleCropTransform())
                     .into(navHeaderView.nav_header_imageView_user_image)
             }
@@ -190,33 +185,41 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         supportFragmentManager.beginTransaction().replace(R.id.activity_logged_frame_layout, googleMapFragment).commit()
     }
 
-    private fun checkLocationAccessGranted(): Boolean{
+    private fun launchListRestaurantsFragment(){
 
-        val permissionAccessCoarseLocationApproved = ActivityCompat
-            .checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED
+        val listRestaurantsFragment = ListRestaurantsFragment.newInstance()
 
-        val permissionAccessFineLocationApproved = ActivityCompat
-            .checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED
-
-        if (!permissionAccessCoarseLocationApproved || !permissionAccessFineLocationApproved){
-            ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_COARSE_LOCATION)
-
-            checkLocationAccessGranted()
-        } else {
-            return true
-        }
-
-        return true
+        supportFragmentManager.beginTransaction().replace(R.id.activity_logged_frame_layout, listRestaurantsFragment).commit()
     }
 
-    private fun setObserveLocation(){
-        LocationRepoImpl.instance.getLocationLiveData().observe(this, Observer {
-            loggedViewModel.launchSearchNearbyRestaurant(it)
-        })
+    private fun checkLocationAccessGranted(){
+
+        val locationEnabled = loggedViewModel.checkLocationEnabled(this)
+
+        if (!locationEnabled) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                REQUEST_LOCATION
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_LOCATION) {
+            for (result in grantResults){
+                if(result == PackageManager.PERMISSION_DENIED){
+                    finish()
+                }
+            }
+        }
     }
 
 }

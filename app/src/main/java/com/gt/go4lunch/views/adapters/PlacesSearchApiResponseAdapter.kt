@@ -52,6 +52,8 @@ class PlacesSearchApiResponseAdapter(private val listRestaurant: List<Restaurant
 
             textViewName.text = listRestaurants[position].name
             textViewAddress.text = listRestaurants[position].address
+            textViewDistance.text = listRestaurants[position].distance
+            glide.load(listRestaurants[position].urlPicture).into(imageViewRestaurant)
 
         }
 

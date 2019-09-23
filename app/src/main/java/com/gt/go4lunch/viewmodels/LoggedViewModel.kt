@@ -1,15 +1,16 @@
 package com.gt.go4lunch.viewmodels
 
-import android.location.Location
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.gt.go4lunch.data.repositories.location.LocationRepo
-import com.gt.go4lunch.usecases.GoogleListRestaurantsUseCase
 import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 
 class LoggedViewModel(private val usersFirestoreUseCase: UsersFirestoreUseCase,
-                      private val locationRepo: LocationRepo,
-                      private val googleListRestaurantsUseCase: GoogleListRestaurantsUseCase): ViewModel() {
+                      private val locationRepo: LocationRepo): ViewModel() {
 
     fun createUserInFirestoreIfDoesntExist(){
 
@@ -27,17 +28,24 @@ class LoggedViewModel(private val usersFirestoreUseCase: UsersFirestoreUseCase,
 
     }
 
-    fun startLocationUpdate(locationEnabled: Boolean){
-        locationRepo.beginSearchLocation(locationEnabled)
-    }
-
-    fun launchSearchNearbyRestaurant(userLocation: Location){
-
-        googleListRestaurantsUseCase.getListRestaurant(userLocation)
-
+    fun startLocationUpdate(){
+        locationRepo.beginSearchLocation()
     }
 
     fun stopLocationUpdate(){
         locationRepo.stopLocationUpdate()
+    }
+
+    fun checkLocationEnabled(activity: Activity): Boolean{
+
+        val permissionAccessCoarseLocationApproved = ActivityCompat
+            .checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+
+        val permissionAccessFineLocationApproved = ActivityCompat
+            .checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+
+        return !(!permissionAccessCoarseLocationApproved || !permissionAccessFineLocationApproved)
     }
 }

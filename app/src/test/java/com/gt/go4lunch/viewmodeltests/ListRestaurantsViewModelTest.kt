@@ -1,17 +1,16 @@
-package com.gt.go4lunch.usecasestests
+package com.gt.go4lunch.viewmodeltests
 
 import android.content.Context
 import android.content.res.Resources
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.gt.go4lunch.data.*
-import com.gt.go4lunch.data.repositories.places.GooglePlacesCacheRepo
 import com.gt.go4lunch.testutils.CoroutinesTestRules
-import com.gt.go4lunch.usecases.GoogleListRestaurantsUseCase
+import com.gt.go4lunch.usecases.GoogleListRestaurant
+import com.gt.go4lunch.viewmodels.ListRestaurantsViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import net.danlew.android.joda.JodaTimeAndroid
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -23,7 +22,7 @@ import java.io.InputStream
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
-class ListRestaurantsUseCaseTest {
+class ListRestaurantsViewModelTest {
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -32,8 +31,12 @@ class ListRestaurantsUseCaseTest {
     @get:Rule
     var coroutinesTestRule = CoroutinesTestRules()
 
-    private lateinit var googlePlacesCacheRepo: GooglePlacesCacheRepo
-    private val loc = android.location.Location("TestLoc")
+    private lateinit var listRestaurantUseCase: GoogleListRestaurant
+
+    private val loc = android.location.Location("TestLoc").apply {
+        latitude = 48.0175400
+        longitude = 6.5882000
+    }
 
     val googlePlacesResponse: PlacesSearchApiResponse = PlacesSearchApiResponse().apply {
         results = listOf(Result().apply {
@@ -68,10 +71,10 @@ class ListRestaurantsUseCaseTest {
     }
 
     @Before
-    fun setRepo(){
-        googlePlacesCacheRepo = object :
-            GooglePlacesCacheRepo {
-            override fun getListRestaurants(location: String): PlacesSearchApiResponse = googlePlacesResponse
+    fun setUseCase(){
+        listRestaurantUseCase = object :
+            GoogleListRestaurant {
+            override suspend fun getListRestaurant(location: String): PlacesSearchApiResponse? = googlePlacesResponse
         }
     }
 
@@ -95,12 +98,12 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(0)?.apply {
             name = "Bonjour"
         }
-        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 
-        listRestaurantsUseCase.fetchListRestaurants("")
+        listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        assertEquals("Bonjour", listRestaurantsUseCase.listRestaurants.value?.get(0)?.name)
+        assertEquals("Bonjour", listRestaurantsViewModel.listRestaurants.value?.get(0)?.name)
     }
 
     @Test
@@ -109,12 +112,12 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(0)?.apply {
             vicinity = "adresse"
         }
-        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 
-        listRestaurantsUseCase.fetchListRestaurants("")
+        listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        assertEquals("adresse", listRestaurantsUseCase.listRestaurants.value?.get(0)?.address)
+        assertEquals("adresse", listRestaurantsViewModel.listRestaurants.value?.get(0)?.address)
     }
 
     @Test
@@ -123,12 +126,12 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(0)?.apply {
             icon = "url de l'image"
         }
-        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 
-        listRestaurantsUseCase.fetchListRestaurants("")
+        listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        assertEquals("url de l'image", listRestaurantsUseCase.listRestaurants.value?.get(0)?.urlPicture)
+        assertEquals("url de l'image", listRestaurantsViewModel.listRestaurants.value?.get(0)?.urlPicture)
     }
 
     @Test
@@ -139,47 +142,53 @@ class ListRestaurantsUseCaseTest {
                 openNow = true
             }
         }
-        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 
-        listRestaurantsUseCase.fetchListRestaurants("")
+        listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        listRestaurantsUseCase.listRestaurants.value?.get(0)?.isOpen?.let { assertTrue(it) }
+        assertEquals("true", listRestaurantsViewModel.listRestaurants.value?.get(0)?.isOpen)
     }
 
     @Test
-    fun `should expose list of models (restaurant) - get latitude and longitude`() = runBlockingTest {
+    fun `should calculate distance`() = runBlockingTest {
         //given
-        googlePlacesResponse.results?.get(0)?.apply {
-            geometry = Geometry().apply {
-                location = Location().apply {
-                    lat = -65413251.45864
-                    lng = 546541.165846
-                }
-            }
-        }
-        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
 
-        listRestaurantsUseCase.fetchListRestaurants("")
+        val firstLatLngToTestDistance = Location().apply {
+            lat = 48.0175400
+            lng = 6.5882000
+        }
+
+        val secondLatLngToTestDistance = Location().apply {
+            lat = 48.1833300
+            lng = 6.4500000
+
+        }
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
+
+
+        val distance = listRestaurantsViewModel.calculateDistance(firstLatLngToTestDistance.lat,
+            firstLatLngToTestDistance.lng,
+            secondLatLngToTestDistance.lat,
+            secondLatLngToTestDistance.lng)
 
         //then
-        assertEquals(listOf((-65413251.45864), 546541.165846), listRestaurantsUseCase.listRestaurants.value?.get(0)?.latLng)
+        assertEquals(20000.00, distance, 1000.00)
     }
 
     @Test
     fun `should expose list of models (restaurant) - get types`() = runBlockingTest {
         //given
         googlePlacesResponse.results?.get(0)?.apply {
-            types = listOf("veggie")
+            types = listOf("veggie", "Très bon")
         }
-        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 
-        listRestaurantsUseCase.fetchListRestaurants("")
+        listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        assertEquals("veggie",
-            listRestaurantsUseCase.listRestaurants.value?.get(0)?.types?.get(0)
-        )
+        assertEquals("veggie, Très bon",
+            listRestaurantsViewModel.listRestaurants.value?.get(0)?.types)
     }
 
     @Test
@@ -188,12 +197,12 @@ class ListRestaurantsUseCaseTest {
         googlePlacesResponse.results?.get(1)?.apply {
             name = "second restaurant name here"
         }
-        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 
-        listRestaurantsUseCase.fetchListRestaurants("")
+        listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        assertEquals("second restaurant name here", listRestaurantsUseCase.listRestaurants.value?.get(1)?.name)
+        assertEquals("second restaurant name here", listRestaurantsViewModel.listRestaurants.value?.get(1)?.name)
     }
 
     @Test
@@ -203,12 +212,32 @@ class ListRestaurantsUseCaseTest {
         loc.latitude = 6654.564
         loc.longitude = 5643.68546
 
-        val listRestaurantsUseCase = GoogleListRestaurantsUseCase(googlePlacesCacheRepo)
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 
-        val stringToTest = listRestaurantsUseCase.transformLocationQueryReady(loc)
+        val stringToTest = listRestaurantsViewModel.transformLocationQueryReady(loc)
 
         //then
-        assertEquals("location=6654.564,5643.68546", stringToTest)
+        assertEquals("6654.564,5643.68546", stringToTest)
     }
+
+    @Test
+    fun `should expose list of models (restaurant) - get distance`() = runBlockingTest {
+        //given
+        googlePlacesResponse.results?.get(0)?.apply {
+            geometry = Geometry().apply {
+                location = Location().apply {
+                    lat = 48.1833300
+                    lng = 6.4500000
+                }
+            }
+        }
+        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
+
+        listRestaurantsViewModel.fetchListRestaurants(loc)
+
+        //then
+        assertEquals("19712", listRestaurantsViewModel.listRestaurants.value?.get(0)?.distance)
+    }
+
 
 }

@@ -7,7 +7,7 @@ class Result {
 
     @SerializedName("geometry")
     @Expose
-    var geometry: Geometry? = null
+    var geometry: Geometry = Geometry()
     @SerializedName("icon")
     @Expose
     var icon: String? = null
@@ -16,7 +16,7 @@ class Result {
     var id: String? = null
     @SerializedName("name")
     @Expose
-    var name: String? = null
+    var name: String = ""
     @SerializedName("opening_hours")
     @Expose
     var openingHours: OpeningHours? = null
@@ -34,6 +34,6 @@ class Result {
     var types: List<String>? = null
     @SerializedName("vicinity")
     @Expose
-    var vicinity: String? = null
+    var vicinity: String = ""
 
 }
