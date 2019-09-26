@@ -7,7 +7,7 @@ import androidx.room.Query
 @Dao
 interface GeometryDao {
 
-    @Query("SELECT * FROM GeometryTable WHERE geometryID LIKE :geometryID")
+    @Query("SELECT * FROM GeometryTable WHERE geometryID == :geometryID")
     suspend fun getGeometry(geometryID: Int): GeometryTable
 
     @Insert

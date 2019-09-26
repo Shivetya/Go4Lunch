@@ -12,6 +12,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.gt.go4lunch.R
@@ -55,9 +56,12 @@ class GoogleMapFragment: Fragment(), OnMapReadyCallback {
     private fun setObserve(){
         LocationRepoImpl.instance.getLocationLiveData().observe(this, Observer {
             updateUILocation(it)
+            mapViewModel.getListRestaurantMarker(it)
         })
 
-        //TODO : Add observe to viewmodel for nearbyrestaurants.
+        mapViewModel.listRestaurantMarker.observe(this, Observer {
+            updateUIListRestaurantsMarkers(it)
+        })
     }
 
     private fun updateUILocation(userLoc: Location){
@@ -75,7 +79,10 @@ class GoogleMapFragment: Fragment(), OnMapReadyCallback {
             val lng = restaurant.lng
 
             val restaurantLoc = LatLng(lat, lng)
-            map.addMarker(MarkerOptions().position(restaurantLoc).title(restaurant.name))
+            map.addMarker(MarkerOptions()
+                .position(restaurantLoc)
+                .title(restaurant.name)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
 
         }
     }

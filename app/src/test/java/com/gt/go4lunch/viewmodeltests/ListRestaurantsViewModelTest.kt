@@ -151,32 +151,6 @@ class ListRestaurantsViewModelTest {
     }
 
     @Test
-    fun `should calculate distance`() = runBlockingTest {
-        //given
-
-        val firstLatLngToTestDistance = Location().apply {
-            lat = 48.0175400
-            lng = 6.5882000
-        }
-
-        val secondLatLngToTestDistance = Location().apply {
-            lat = 48.1833300
-            lng = 6.4500000
-
-        }
-        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
-
-
-        val distance = listRestaurantsViewModel.calculateDistance(firstLatLngToTestDistance.lat,
-            firstLatLngToTestDistance.lng,
-            secondLatLngToTestDistance.lat,
-            secondLatLngToTestDistance.lng)
-
-        //then
-        assertEquals(20000.00, distance, 1000.00)
-    }
-
-    @Test
     fun `should expose list of models (restaurant) - get types`() = runBlockingTest {
         //given
         googlePlacesResponse.results?.get(0)?.apply {
@@ -236,8 +210,7 @@ class ListRestaurantsViewModelTest {
         listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        assertEquals("19712", listRestaurantsViewModel.listRestaurants.value?.get(0)?.distance)
+        assertEquals("21113", listRestaurantsViewModel.listRestaurants.value?.get(0)?.distance)
     }
-
 
 }

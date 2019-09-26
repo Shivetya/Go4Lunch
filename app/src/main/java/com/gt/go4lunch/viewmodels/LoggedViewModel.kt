@@ -1,16 +1,22 @@
 package com.gt.go4lunch.viewmodels
 
 import android.Manifest
-import android.app.Activity
+import android.app.Application
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.gt.go4lunch.data.repositories.location.LocationRepo
 import com.gt.go4lunch.usecases.UsersFirestoreUseCase
 
 class LoggedViewModel(private val usersFirestoreUseCase: UsersFirestoreUseCase,
-                      private val locationRepo: LocationRepo): ViewModel() {
+                      private val locationRepo: LocationRepo,
+                      private val application: Application): ViewModel() {
+
+    private val _locationEnabledLiveData: MutableLiveData<Boolean> = MutableLiveData()
+    val locationEnabledLiveData: LiveData<Boolean> = _locationEnabledLiveData
 
     fun createUserInFirestoreIfDoesntExist(){
 
@@ -36,16 +42,18 @@ class LoggedViewModel(private val usersFirestoreUseCase: UsersFirestoreUseCase,
         locationRepo.stopLocationUpdate()
     }
 
-    fun checkLocationEnabled(activity: Activity): Boolean{
+    fun checkLocationEnabled(){
 
         val permissionAccessCoarseLocationApproved = ActivityCompat
-            .checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+            .checkSelfPermission(application, Manifest.permission.ACCESS_COARSE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
 
         val permissionAccessFineLocationApproved = ActivityCompat
-            .checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            .checkSelfPermission(application, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
 
-        return !(!permissionAccessCoarseLocationApproved || !permissionAccessFineLocationApproved)
+        val isEnabled = !(!permissionAccessCoarseLocationApproved || !permissionAccessFineLocationApproved)
+
+        _locationEnabledLiveData.value = isEnabled
     }
 }

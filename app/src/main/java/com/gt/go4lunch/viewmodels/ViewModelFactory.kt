@@ -2,6 +2,7 @@ package com.gt.go4lunch.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.gt.go4lunch.MainApplication
 import com.gt.go4lunch.data.repositories.location.LocationRepo
 import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
 import com.gt.go4lunch.usecases.GoogleListRestaurantsUseCase
@@ -16,7 +17,7 @@ class ViewModelFactory private constructor(private val usersFirestoreUseCase: Us
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
 
         return when {
-            modelClass.isAssignableFrom(LoggedViewModel::class.java) -> LoggedViewModel(usersFirestoreUseCase, locationRepo) as T
+            modelClass.isAssignableFrom(LoggedViewModel::class.java) -> LoggedViewModel(usersFirestoreUseCase, locationRepo, MainApplication.getInstance()) as T
             modelClass.isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(usersFirestoreUseCase) as T
             modelClass.isAssignableFrom(ListRestaurantsViewModel::class.java) -> ListRestaurantsViewModel(googleListRestaurantsUseCase) as T
             modelClass.isAssignableFrom(GoogleMapViewModel::class.java) -> GoogleMapViewModel(googleListRestaurantsUseCase) as T

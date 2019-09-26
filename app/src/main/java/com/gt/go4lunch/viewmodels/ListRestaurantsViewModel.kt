@@ -18,7 +18,7 @@ class ListRestaurantsViewModel(private val listRestaurantsUseCase: GoogleListRes
     private val _listRestaurants: MutableLiveData<List<Restaurant>> = MutableLiveData()
     val listRestaurants: LiveData<List<Restaurant>> = _listRestaurants
 
-    suspend fun getListRestaurant(location: Location){
+    fun getListRestaurant(location: Location){
 
         cancelJobIfActive()
 
@@ -35,12 +35,12 @@ class ListRestaurantsViewModel(private val listRestaurantsUseCase: GoogleListRes
         val listRestaurants = listRestaurantsUseCase.getListRestaurant(locationQueryReady)
             ?.results
             ?.map {
-                val lat1 = location.latitude
-                val lng1 = location.longitude
-                val lat2 = it.geometry.location.lat
-                val lng2 = it.geometry.location.lng
 
-                val distance = calculateDistance(lat1, lng1, lat2, lng2)
+                val locationRestaurant = Location("restaurant")
+                locationRestaurant.latitude = it.geometry.location.lat
+                locationRestaurant.longitude = it.geometry.location.lng
+
+                val distance = location.distanceTo(locationRestaurant)
                     Restaurant(it.name,
                         it.icon,
                         it.vicinity,
@@ -73,30 +73,5 @@ class ListRestaurantsViewModel(private val listRestaurantsUseCase: GoogleListRes
                 it.cancel()
             }
         }
-    }
-
-    @VisibleForTesting
-    fun calculateDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double{
-
-        val earthRadius = 6378137
-
-        val rLat1 = transformDegreeToRad(lat1)
-        val rLng1 = transformDegreeToRad(lng1)
-        val rLat2 = transformDegreeToRad(lat2)
-        val rLng2 = transformDegreeToRad(lng2)
-
-        val dLo = (rLat2 - rLat1)/2
-        val dLa = (rLng2 - rLng1)/2
-
-        val a = (sin(dLa)*sin(dLa)) + cos(rLat1)* cos(rLat2) * (sin(dLo)* sin(dLo))
-
-        val d = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        return earthRadius * d
-
-    }
-
-    private fun transformDegreeToRad(angle: Double): Double{
-        return Math.PI*angle/180
     }
 }

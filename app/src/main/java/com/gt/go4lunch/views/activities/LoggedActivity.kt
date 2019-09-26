@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -194,9 +195,14 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
 
     private fun checkLocationAccessGranted(){
 
-        val locationEnabled = loggedViewModel.checkLocationEnabled(this)
+        var isEnabled = false
 
-        if (!locationEnabled) {
+        loggedViewModel.locationEnabledLiveData.observe(this, Observer {
+            isEnabled = it
+        })
+        loggedViewModel.checkLocationEnabled()
+
+        if (!isEnabled) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(
@@ -213,9 +219,14 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == REQUEST_LOCATION) {
+        if (requestCode == REQUEST_LOCATION
+            && permissions.contains(Manifest.permission.ACCESS_FINE_LOCATION)
+            && permissions.contains(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+
             for (result in grantResults){
+
                 if(result == PackageManager.PERMISSION_DENIED){
+
                     finish()
                 }
             }
