@@ -1,20 +1,15 @@
 package com.gt.go4lunch.data.repositories.room
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.ForeignKey
-
-import androidx.room.PrimaryKey
-import java.time.LocalDateTime
+import androidx.room.*
 
 @Entity
 data class ResultTable(
-    @PrimaryKey val resultID: Int,
+    @PrimaryKey (autoGenerate = true) @ColumnInfo(name = "result_id") val resultID: Int = 0,
     @Embedded val geometry: GeometryTable,
-    @Embedded val openingHours: OpeningHoursTable?,
+    @Embedded val opening_hours: OpeningHoursTable?,
     val types: String?,
     val name: String,
-    val iconURL: String,
+    @ColumnInfo(name = "icon_url") val iconURL : String?,
     val vicinity: String,
-    val ttl: LocalDateTime
+    val ttl: String
 )

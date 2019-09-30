@@ -8,8 +8,8 @@ import androidx.room.Query
 @Dao
 interface OpeningHoursDao {
 
-    @Query("SELECT * FROM OpeningHoursTable WHERE openingHoursID == :openingHoursID")
-    suspend fun getOpeningHours(openingHoursID: Int)
+    @Query("SELECT * FROM OpeningHoursTable WHERE opening_id=:openingHoursID")
+    suspend fun getOpeningHours(openingHoursID: Int): OpeningHoursTable
 
     @Insert
     suspend fun insertOpeningHours(openingHours: OpeningHoursTable)

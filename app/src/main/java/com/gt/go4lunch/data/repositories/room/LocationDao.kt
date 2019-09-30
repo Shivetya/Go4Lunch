@@ -7,7 +7,7 @@ import androidx.room.Query
 @Dao
 interface LocationDao {
 
-    @Query("SELECT * FROM LocationTable WHERE locationID == :locationID")
+    @Query("SELECT * FROM LocationTable WHERE location_id=:locationID")
     suspend fun getLocation(locationID: Int): LocationTable
 
     @Insert

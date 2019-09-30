@@ -195,23 +195,21 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
 
     private fun checkLocationAccessGranted(){
 
-        var isEnabled = false
-
         loggedViewModel.locationEnabledLiveData.observe(this, Observer {
-            isEnabled = it
+            if (!it) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ),
+                    REQUEST_LOCATION
+                )
+            }
         })
         loggedViewModel.checkLocationEnabled()
 
-        if (!isEnabled) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-                REQUEST_LOCATION
-            )
-        }
+
     }
 
     override fun onRequestPermissionsResult(
