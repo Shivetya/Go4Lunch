@@ -8,11 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 
 import com.gt.go4lunch.R
+import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
 import com.gt.go4lunch.models.Restaurant
 import com.gt.go4lunch.viewmodels.ListRestaurantsViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
+import com.gt.go4lunch.views.adapters.PlacesSearchApiResponseAdapter
 
 class ListRestaurantsFragment : Fragment() {
 
@@ -23,7 +28,8 @@ class ListRestaurantsFragment : Fragment() {
     }
 
     private lateinit var viewModel: ListRestaurantsViewModel
-    //private lateinit var restaurants: MutableCollection<Restaurant>
+    private lateinit var restaurants: MutableList<Restaurant>
+    lateinit var adapter: PlacesSearchApiResponseAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,13 +40,36 @@ class ListRestaurantsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_list_restaurants, container, false)
 
         viewModel = ViewModelProviders.of(this, ViewModelFactory.INSTANCE).get(ListRestaurantsViewModel::class.java)
+        val fragmentRV = view.findViewById<View>(R.id.fragment_list_restaurants_recycler_view) as RecyclerView
+        configureRecyclerView(fragmentRV)
+
+        setObserveAndLaunchSearch()
 
         return view
     }
 
-    /*private fun updateUI(restaurants: Collection<Restaurant>){
+    private fun setObserveAndLaunchSearch(){
+        LocationRepoImpl.instance.getLocationLiveData().observe(this, Observer {
+            viewModel.getListRestaurant(it)
+        })
+        viewModel.listRestaurants.observe(this, Observer {
+            updateUI(it)
+        })
+    }
 
-    }*/
+    private fun updateUI(listRestaurants: Collection<Restaurant>){
+        restaurants.clear()
+        restaurants.addAll(listRestaurants)
+        adapter.notifyDataSetChanged()
+    }
 
+    private fun configureRecyclerView(recyclerView : RecyclerView){
+
+        restaurants = mutableListOf()
+        recyclerView.layoutManager = LinearLayoutManager(activity?.applicationContext)
+        adapter = PlacesSearchApiResponseAdapter(restaurants, Glide.with(this))
+        recyclerView.adapter = adapter
+
+    }
 
 }

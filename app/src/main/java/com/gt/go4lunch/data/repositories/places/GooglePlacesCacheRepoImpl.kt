@@ -24,9 +24,7 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
 
         val dateTimeNow = DateTime()
 
-        val ttl = dateTimeNow.plusMinutes(30)
-
-        val cacheResults = resultsDao.getResultsByCache(latUser, lngUser, ttl.toString())
+        val cacheResults = resultsDao.getResultsByCache(latUser, lngUser, dateTimeNow.toString())
 
         return if (cacheResults.isEmpty()){
 
@@ -34,7 +32,9 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
 
             val resultsApi = placesRepo.getNearbyRestaurants(location)
 
-            saveResult(resultsApi, ttl)
+            val ttl = dateTimeNow.plusMinutes(30)
+
+            saveResult(resultsApi, ttl.toString(), latUser, lngUser)
 
             resultsApi
         } else {
@@ -44,7 +44,7 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
     }
 
 
-    private suspend fun saveResult(resultApi: PlacesSearchApiResponse?, ttl: DateTime){
+    private suspend fun saveResult(resultApi: PlacesSearchApiResponse?, ttl: String, actualLatUser: Double, actualLngUser: Double){
         resultApi?.results?.map {
             resultsDao.insertResult(ResultTable(
                 geometry = GeometryTable(
@@ -58,7 +58,9 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
                 types = it.types?.joinToString(),
                 iconURL = it.icon,
                 vicinity = it.vicinity,
-                ttl = ttl.toString()
+                ttl = ttl,
+                latUser = actualLatUser,
+                lngUser = actualLngUser
             ))
         }
     }
@@ -66,23 +68,29 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
     private fun mapCacheResults(cacheResults: List<ResultTable>): PlacesSearchApiResponse{
 
         return PlacesSearchApiResponse().apply {
-            for (result in cacheResults){
-                result.let {
-                    Result().apply {
-                        name = it.name
-                        vicinity = it.vicinity
-                        types = it.types?.split(", ")
-                        icon = it.iconURL
-                        geometry = Geometry().apply {
-                            location = Location().apply {
-                                lat = it.geometry.location.lat
-                                lng = it.geometry.location.lng
+
+            results = mutableListOf()
+
+            for (resultsDao in cacheResults){
+
+                resultsDao.let {
+
+                    (results as MutableList<Result>).add(Result().apply {
+
+                        this.name = it.name
+                        this.vicinity = it.vicinity
+                        this.types = it.types?.split(", ")
+                        this.icon = it.iconURL
+                        this.geometry = Geometry().apply {
+                            this.location = Location().apply {
+                                this.lat = it.geometry.location.lat
+                                this.lng = it.geometry.location.lng
                             }
                         }
-                        openingHours = OpeningHours().apply {
-                            openNow = it.opening_hours?.openNow
+                        this.openingHours = OpeningHours().apply {
+                            this.openNow = it.opening_hours?.openNow
                         }
-                    }
+                    })
                 }
             }
         }

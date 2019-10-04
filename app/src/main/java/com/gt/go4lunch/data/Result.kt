@@ -25,7 +25,7 @@ class Result {
     var photos: List<Photo>? = null
     @SerializedName("place_id")
     @Expose
-    var placeId: String? = null
+    var placeId: String = ""
     @SerializedName("reference")
     @Expose
     var reference: String? = null

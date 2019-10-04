@@ -6,5 +6,6 @@ data class Restaurant(
     val address: String,
     val isOpen: String,
     val distance: String,
-    val types: String?
+    val types: String?,
+    val id: String
 )

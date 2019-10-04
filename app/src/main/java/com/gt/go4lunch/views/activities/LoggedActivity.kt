@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.firebase.ui.auth.AuthUI
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.gt.go4lunch.R
@@ -39,7 +40,7 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         setContentView(R.layout.activity_logged)
 
         JodaTimeAndroid.init(this)
-        configureToolbarAndDrawer()
+        configureToolbarAndDrawerAndBottomBar()
 
         updateUIWithUsersInfo()
 
@@ -105,22 +106,13 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
             R.id.nav_drawer_logout -> {
                 logoutUser()
             }
-            R.id.menu_bottom_nav_map -> {
-                launchGoogleMapFragment()
-            }
-            R.id.menu_bottom_nav_list -> {
-                launchListRestaurantsFragment()
-            }
-            R.id.menu_bottom_nav_workmates -> {
-
-            }
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
 
-    private fun configureToolbarAndDrawer(){
+    private fun configureToolbarAndDrawerAndBottomBar(){
         val toolbar: Toolbar = findViewById(R.id.activity_toolbar)
         setSupportActionBar(toolbar)
 
@@ -134,6 +126,22 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
 
         navView.setNavigationItemSelectedListener(this)
         activity_toolbar.title = getString(R.string.i_am_hungry)
+
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.activity_logged_bottom_nav)
+
+        bottomNavigation.setOnNavigationItemReselectedListener {
+            when(it.itemId){
+                R.id.menu_bottom_nav_map -> {
+                    launchGoogleMapFragment()
+                }
+                R.id.menu_bottom_nav_list -> {
+                    launchListRestaurantsFragment()
+                }
+                R.id.menu_bottom_nav_workmates -> {
+
+                }
+            }
+        }
     }
 
     private fun updateUIWithUsersInfo(){

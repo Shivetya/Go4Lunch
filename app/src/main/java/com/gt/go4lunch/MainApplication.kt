@@ -22,6 +22,5 @@ class MainApplication: Application() {
 
         setApplication(this)
 
-
     }
 }

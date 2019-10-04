@@ -71,19 +71,21 @@ class GoogleMapFragment: Fragment(), OnMapReadyCallback {
 
     }
 
-    private fun updateUIListRestaurantsMarkers(listRestaurants: Collection<RestaurantMarker>){
+    private fun updateUIListRestaurantsMarkers(listRestaurants: Collection<RestaurantMarker>?){
 
-        for(restaurant in listRestaurants){
+        if (listRestaurants != null) {
+            for(restaurant in listRestaurants){
 
-            val lat = restaurant.lat
-            val lng = restaurant.lng
+                val lat = restaurant.lat
+                val lng = restaurant.lng
 
-            val restaurantLoc = LatLng(lat, lng)
-            map.addMarker(MarkerOptions()
-                .position(restaurantLoc)
-                .title(restaurant.name)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
+                val restaurantLoc = LatLng(lat, lng)
+                map.addMarker(MarkerOptions()
+                    .position(restaurantLoc)
+                    .title(restaurant.name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)))
 
+            }
         }
     }
 

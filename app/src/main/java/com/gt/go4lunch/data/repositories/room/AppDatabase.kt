@@ -23,7 +23,8 @@ abstract class AppDatabase: RoomDatabase() {
                         INSTANCE = Room.databaseBuilder(
                             MainApplication.getInstance(),
                             AppDatabase::class.java, "Database.db"
-                        ).build()
+                        ).setJournalMode(JournalMode.TRUNCATE)
+                            .build()
                     }
                 }
             }

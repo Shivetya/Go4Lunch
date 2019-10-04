@@ -11,5 +11,7 @@ data class ResultTable(
     val name: String,
     @ColumnInfo(name = "icon_url") val iconURL : String?,
     val vicinity: String,
-    val ttl: String
+    val ttl: String,
+    @ColumnInfo(name = "lat_user") val latUser: Double,
+    @ColumnInfo(name = "lng_user") val lngUser: Double
 )

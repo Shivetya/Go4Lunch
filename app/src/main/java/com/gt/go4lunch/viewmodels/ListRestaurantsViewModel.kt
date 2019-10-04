@@ -5,10 +5,13 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.net.PlacesClient
+import com.gt.go4lunch.MainApplication
 import com.gt.go4lunch.models.Restaurant
 import com.gt.go4lunch.usecases.GoogleListRestaurant
+import com.gt.go4lunch.utils.GitIgnore
 import kotlinx.coroutines.*
-import kotlin.math.*
 
 
 class ListRestaurantsViewModel(private val listRestaurantsUseCase: GoogleListRestaurant): ViewModel() {
@@ -42,13 +45,14 @@ class ListRestaurantsViewModel(private val listRestaurantsUseCase: GoogleListRes
 
                 val distance = location.distanceTo(locationRestaurant)
                     Restaurant(it.name,
-                        it.icon,
+                        it.photos?.get(0)?.photoReference,
                         it.vicinity,
                         it.openingHours?.openNow.toString(),
                         distance.toString().substringBefore("."),
                         it.types?.joinToString(
                             separator = ", "
-                        ))
+                        ),
+                        it.placeId)
             }
 
         withContext(Dispatchers.Main){
