@@ -1,7 +1,7 @@
 package com.gt.go4lunch.data.repositories.places
 
 import com.gt.go4lunch.data.PlacesSearchApiResponse
-import com.gt.go4lunch.utils.Key
+import com.gt.go4lunch.utils.ApiKeyGitIgnore
 import com.gt.go4lunch.utils.TLSSocketFactory
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -20,7 +20,7 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
         private var serviceNearbyRestaurant: GooglePlacesApi
 
         private const val KEY_NAME = "key"
-        private const val API_KEY = Key.API_PLACES_KEY
+        private const val API_KEY = ApiKeyGitIgnore.API_PLACES_KEY
 
         private const val TYPE_NAME = "type"
         private const val TYPE_VALUE = "restaurant"

@@ -11,5 +11,4 @@
 /build
 /captures
 .externalNativeBuild
-Key.kt
-
+/app/src/main/java/com/gt/go4lunch/utils/ApiKeyGitIgnore.kt
