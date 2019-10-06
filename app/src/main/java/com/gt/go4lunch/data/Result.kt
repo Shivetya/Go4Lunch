@@ -35,5 +35,8 @@ class Result {
     @SerializedName("vicinity")
     @Expose
     var vicinity: String = ""
+    @SerializedName("rating")
+    @Expose
+    var rating: Double = 0.0
 
 }
