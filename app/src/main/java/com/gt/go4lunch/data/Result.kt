@@ -16,7 +16,7 @@ class Result {
     var id: String? = null
     @SerializedName("name")
     @Expose
-    var name: String = ""
+    var name: String? = ""
     @SerializedName("opening_hours")
     @Expose
     var openingHours: OpeningHours? = null
@@ -25,7 +25,7 @@ class Result {
     var photos: List<Photo>? = null
     @SerializedName("place_id")
     @Expose
-    var placeId: String = ""
+    var placeId: String? = ""
     @SerializedName("reference")
     @Expose
     var reference: String? = null
@@ -34,9 +34,9 @@ class Result {
     var types: List<String>? = null
     @SerializedName("vicinity")
     @Expose
-    var vicinity: String = ""
+    var vicinity: String? = ""
     @SerializedName("rating")
     @Expose
-    var rating: Double = 0.0
+    var rating: Double? = 0.0
 
 }

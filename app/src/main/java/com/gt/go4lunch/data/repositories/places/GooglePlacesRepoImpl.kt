@@ -1,5 +1,7 @@
 package com.gt.go4lunch.data.repositories.places
 
+import android.media.Image
+import com.gt.go4lunch.data.PlacesDetailsApiResponse
 import com.gt.go4lunch.data.PlacesSearchApiResponse
 import com.gt.go4lunch.utils.ApiKeyGitIgnore
 import com.gt.go4lunch.utils.TLSSocketFactory
@@ -18,6 +20,8 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
     companion object {
 
         private var serviceNearbyRestaurant: GooglePlacesApi
+        private var serviceDetailsRestaurant: GooglePlacesApi
+        private var servicePhotoRestaurant: GooglePlacesApi
 
         private const val KEY_NAME = "key"
         private const val API_KEY = ApiKeyGitIgnore.API_PLACES_KEY
@@ -31,7 +35,18 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
         private const val INPUT_TYPE_NAME = "inputtype"
         private const val INPUT_TYPE_VALUE = "textquery"
 
+        private const val FIELDS_NAME = "fields"
+        private const val FIELDS_VALUE = "opening_hours,rating"
+
+        private const val MAXWIDTH_NAME = "maxwidth"
+        private const val MAXWIDTH_VALUE = "200"
+
+        private const val MAXHEIGHT_NAME = "maxheight"
+        private const val MAXHEIGHT_VALUE = "200"
+
         init {
+
+            //first part for nearby Restaurants request
 
             val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
             trustManagerFactory.init(null as KeyStore?)
@@ -41,7 +56,7 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
             }
             val trustManager = trustManagers[0] as X509TrustManager
 
-            val paramsInterceptor = Interceptor{ chain ->
+            val paramsInterceptorNearbyRestaurant = Interceptor{ chain ->
                 var request = chain.request()
                 val url = request.url()
                     .newBuilder()
@@ -65,26 +80,107 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
             val loggingInterceptor = HttpLoggingInterceptor()
             loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
-            val client = OkHttpClient.Builder()
+            val clientNearbyRestaurant = OkHttpClient.Builder()
                 .sslSocketFactory(TLSSocketFactory(), trustManager)
-                .addInterceptor(paramsInterceptor)
+                .addInterceptor(paramsInterceptorNearbyRestaurant)
                 .addInterceptor(loggingInterceptor)
                 .build()
 
-            val retrofit = Retrofit.Builder()
+            val retrofitNearbyRestaurant = Retrofit.Builder()
                 .baseUrl("https://maps.googleapis.com/")
-                .client(client)
+                .client(clientNearbyRestaurant)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
-            serviceNearbyRestaurant = retrofit.create(
+            serviceNearbyRestaurant = retrofitNearbyRestaurant.create(
                 GooglePlacesApi::class.java)
+
+
+            //second part for Details restaurant request
+
+            val paramsInterceptorDetailsRestaurant = Interceptor{ chain ->
+                var request = chain.request()
+                val url = request.url()
+                    .newBuilder()
+                    .addQueryParameter(
+                        FIELDS_NAME,
+                        FIELDS_VALUE
+                    )
+                    .addQueryParameter(
+                        KEY_NAME,
+                        API_KEY
+                    )
+                    .build()
+                request = request.newBuilder().url(url).build()
+                chain.proceed(request)
+            }
+
+            val clientDetailsRestaurant = OkHttpClient.Builder()
+                .sslSocketFactory(TLSSocketFactory(), trustManager)
+                .addInterceptor(paramsInterceptorDetailsRestaurant)
+                .addInterceptor(loggingInterceptor)
+                .build()
+
+            val retrofitDetailsRestaurant = Retrofit.Builder()
+                .baseUrl("https://maps.googleapis.com/")
+                .client(clientDetailsRestaurant)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            serviceDetailsRestaurant = retrofitDetailsRestaurant.create(
+                GooglePlacesApi::class.java)
+
+            //third part for photo Restaurant
+
+            val paramsInterceptorPhotoRestaurant = Interceptor{ chain ->
+                var request = chain.request()
+                val url = request.url()
+                    .newBuilder()
+                    .addQueryParameter(
+                        MAXWIDTH_NAME,
+                        MAXWIDTH_VALUE
+                    )
+                    .addQueryParameter(
+                        MAXHEIGHT_NAME,
+                        MAXHEIGHT_VALUE
+                    )
+                    .addQueryParameter(
+                        KEY_NAME,
+                        API_KEY
+                    )
+                    .build()
+                request = request.newBuilder().url(url).build()
+                chain.proceed(request)
+            }
+
+            val clientPhotoRestaurant = OkHttpClient.Builder()
+                .sslSocketFactory(TLSSocketFactory(), trustManager)
+                .addInterceptor(paramsInterceptorPhotoRestaurant)
+                .addInterceptor(loggingInterceptor)
+                .build()
+
+            val retrofitPhotoRestaurant = Retrofit.Builder()
+                .baseUrl("https://maps.googleapis.com/")
+                .client(clientPhotoRestaurant)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            servicePhotoRestaurant = retrofitPhotoRestaurant.create(
+                GooglePlacesApi::class.java)
+
         }
     }
-
-
 
     override fun getNearbyRestaurants(location: String): PlacesSearchApiResponse? {
         return serviceNearbyRestaurant.getNearbyRestaurants(location).execute().body()
     }
+
+    override fun getDetailsRestaurant(restaurantId: String): PlacesDetailsApiResponse? {
+        return serviceDetailsRestaurant.getDetailsForRestaurant(restaurantId).execute().body()
+    }
+
+    override fun getPhotoRestaurant(photoId: String): Image? {
+        return servicePhotoRestaurant.getPhotoForRestaurant(photoId).execute().body()
+    }
+
 }

@@ -12,9 +12,14 @@ interface ResultsDao {
     @Query("SELECT * FROM resultTable where :dateTimeNow < ttl AND (lat_user BETWEEN :latUser - 0.05 AND :latUser + 0.005) AND (lng_user BETWEEN :lngUser - 0.005 AND :lngUser + 0.005)")
     suspend fun getResultsByCache(latUser: Double, lngUser: Double, dateTimeNow: String): List<ResultTable>
 
+    @Query("SELECT * FROM resultTable where restaurant_id = :restaurantID AND :dateTimeNow < ttl")
+    suspend fun getResultDetailsByCache(restaurantID: String, dateTimeNow: String) : ResultTable?
+
     @Insert
     suspend fun insertResult(result: ResultTable)
 
-    @Query("DELETE FROM ResultTable")
-    suspend fun deleteAllResults()
+    @Query("DELETE FROM ResultTable where :dateTimeNow > ttl")
+    suspend fun deleteAllResults(dateTimeNow: String)
+
+
 }
