@@ -5,8 +5,11 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.gt.go4lunch.viewmodels.UserViewModel
+import com.gt.go4lunch.viewmodels.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_settings.*
 
 abstract class UserActivity : AppCompatActivity() {
@@ -17,6 +20,10 @@ abstract class UserActivity : AppCompatActivity() {
         const val REQUEST_LOCATION = 30
     }
 
+    abstract fun updateUI()
+
+    private lateinit var userViewModel: UserViewModel
+
     protected val observerUserTaskSucceed = androidx.lifecycle.Observer<Int> {
         when(it){
             DELETE_USER_TASK -> {
@@ -24,7 +31,7 @@ abstract class UserActivity : AppCompatActivity() {
                 finish()
             }
             UPDATE_USER_NAME -> {
-                activity_settings_progress_bar.visibility = View.GONE
+                updateUI()
             }
         }
     }
@@ -32,6 +39,8 @@ abstract class UserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
 
         super.onCreate(savedInstanceState, persistentState)
+
+        userViewModel = ViewModelProviders.of(this, ViewModelFactory.INSTANCE).get(UserViewModel::class.java)
 
         if(!isUserLogged()){
             startMainActivity()

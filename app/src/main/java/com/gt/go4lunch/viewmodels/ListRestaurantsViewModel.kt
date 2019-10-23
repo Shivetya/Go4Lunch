@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.gt.go4lunch.models.Restaurant
 import com.gt.go4lunch.usecases.GoogleListRestaurant
+import com.gt.go4lunch.utils.OpeningHoursCalculator
+import com.gt.go4lunch.utils.RatingCalculator
 import kotlinx.coroutines.*
 
 
@@ -40,15 +42,17 @@ class ListRestaurantsViewModel(private val listRestaurantsUseCase: GoogleListRes
                 locationRestaurant.longitude = it.geometry.location.lng
 
                 val distance = location.distanceTo(locationRestaurant)
-                    Restaurant(it.name,
-                        it.photos?.get(0)?.photoReference,
-                        it.vicinity,
-                        it.openingHours?.openNow.toString(),
-                        distance.toString().substringBefore("."),
-                        it.types?.joinToString(
+                    Restaurant(name = it.name,
+                        urlPicture =  it.photos?.get(0)?.photoReference,
+                        address =  it.vicinity,
+                        isOpen = getOpenOrCloseString(it.placeId),
+                        distance = distance.toString().substringBefore("."),
+                        types = it.types?.joinToString(
                             separator = ", "
                         ),
-                        it.placeId)
+                        id = it.placeId,
+                        rating = getRatingForStars(it.placeId)
+                    )
             }
 
         withContext(Dispatchers.Main){
@@ -72,6 +76,28 @@ class ListRestaurantsViewModel(private val listRestaurantsUseCase: GoogleListRes
             if(it.isActive){
                 it.cancel()
             }
+        }
+    }
+
+    private suspend fun getOpenOrCloseString(restaurantID: String): String{
+
+        val listPeriod = listRestaurantsUseCase.getDetailRestaurant(restaurantID)?.result?.openingHours?.periods
+
+        val openingHoursCalculator = OpeningHoursCalculator(listPeriod)
+
+        return openingHoursCalculator.stringOpenUntilOrClose
+
+    }
+
+    private suspend fun getRatingForStars(restaurantID: String): Int{
+
+        val googleRating = listRestaurantsUseCase.getDetailRestaurant(restaurantID)?.result?.rating
+
+        return if (googleRating != null){
+            val ratingCalculator = RatingCalculator(googleRating)
+            ratingCalculator.howManyStars
+        }else {
+            0
         }
     }
 }

@@ -239,4 +239,6 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         }
     }
 
+    override fun updateUI() {}
+
 }

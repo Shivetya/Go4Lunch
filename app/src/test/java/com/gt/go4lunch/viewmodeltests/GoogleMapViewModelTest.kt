@@ -3,10 +3,7 @@ package com.gt.go4lunch.viewmodeltests
 import android.content.Context
 import android.content.res.Resources
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.gt.go4lunch.data.Geometry
-import com.gt.go4lunch.data.Location
-import com.gt.go4lunch.data.PlacesSearchApiResponse
-import com.gt.go4lunch.data.Result
+import com.gt.go4lunch.data.*
 import com.gt.go4lunch.testutils.CoroutinesTestRules
 import com.gt.go4lunch.usecases.GoogleListRestaurant
 import com.gt.go4lunch.viewmodels.GoogleMapViewModel
@@ -42,31 +39,38 @@ class GoogleMapViewModelTest {
         longitude = 6.5882000
     }
 
-    val googlePlacesResponse: PlacesSearchApiResponse = PlacesSearchApiResponse().apply {
-        results = listOf(Result().apply {
-            name = "Nom du restaurant ici !!!"
-            geometry = Geometry().apply {
-                location = Location().apply {
-                    lat = 16584.54654
-                    lng = 3654.5754
-                }
-            }
-        }, Result().apply {
-            name = "Un deuxième nom de restaurant ici"
-            geometry = Geometry().apply {
-                location = Location().apply {
-                    lat = 496846521.4
-                    lng = 68546151.6478
-                }
-            }
-        })
-    }
+    val googlePlacesResponse: PlacesSearchApiResponse = PlacesSearchApiResponse(
+        results = listOf(
+            Result(
+                name = "Nom du restaurant ici !!!",
+                geometry = Geometry(
+                    location = Location(
+                        lat = 16584.54654,
+                        lng = 3654.5754
+                    )
+                )
+            ), Result(
+                name = "Un deuxième nom de restaurant ici",
+                geometry = Geometry(
+                    location = Location(
+                        lat = 496846521.4,
+                        lng = 68546151.6478
+                    )
+                )
+            )
+        )
+    )
 
     @Before
-    fun setUseCase(){
+    fun setUseCase() {
         listRestaurantUseCase = object :
             GoogleListRestaurant {
-            override suspend fun getListRestaurant(location: String): PlacesSearchApiResponse? = googlePlacesResponse
+            override suspend fun getListRestaurant(location: String): PlacesSearchApiResponse? =
+                googlePlacesResponse
+
+            override suspend fun getDetailRestaurant(restaurantID: String): PlacesDetailsApiResponse? {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
         }
     }
 
@@ -102,11 +106,12 @@ class GoogleMapViewModelTest {
     fun `should expose list of models (restaurantMarker) - get latitude`() = runBlockingTest {
         //given
         googlePlacesResponse.results?.get(0)?.apply {
-            geometry = Geometry().apply {
-                location = Location().apply {
-                    lat = 48.0175400
-                }
-            }
+            geometry = Geometry(
+                location = Location(
+                    lat = 48.0175400,
+                    lng = 6.5882000
+                )
+            )
         }
         val googleMapViewModel = GoogleMapViewModel(listRestaurantUseCase)
 
@@ -120,12 +125,14 @@ class GoogleMapViewModelTest {
     fun `should expose list of models (restaurantMarker) - get longitude`() = runBlockingTest {
         //given
         googlePlacesResponse.results?.get(0)?.apply {
-            geometry = Geometry().apply {
-                location = Location().apply {
+            geometry = Geometry(
+                location = Location(
+                    lat = 48.0175400,
                     lng = 6.5882000
-                }
-            }
+                )
+            )
         }
+
         val googleMapViewModel = GoogleMapViewModel(listRestaurantUseCase)
 
         googleMapViewModel.fetchListRestaurantMarker(loc)
@@ -145,6 +152,9 @@ class GoogleMapViewModelTest {
         googleMapViewModel.fetchListRestaurantMarker(loc)
 
         //then
-        Assert.assertEquals("restaurant", googleMapViewModel.listRestaurantMarker.value?.get(1)?.name)
+        Assert.assertEquals(
+            "restaurant",
+            googleMapViewModel.listRestaurantMarker.value?.get(1)?.name
+        )
     }
 }

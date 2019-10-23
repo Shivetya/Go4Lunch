@@ -11,8 +11,10 @@ import com.gt.go4lunch.R
 import com.gt.go4lunch.models.Restaurant
 import kotlinx.android.synthetic.main.recycler_view_item.view.*
 
-class PlacesSearchApiResponseAdapter(private val listRestaurant: List<Restaurant>,
-                                     private val glide: RequestManager) : RecyclerView.Adapter<PlacesSearchApiResponseAdapter.PlacesSearchApiResponseViewHolder>(){
+class PlacesSearchApiResponseAdapter(private val glide: RequestManager) : RecyclerView.Adapter<PlacesSearchApiResponseAdapter.PlacesSearchApiResponseViewHolder>(){
+
+    private var listRestaurant: List<Restaurant>? = null
+
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -27,13 +29,17 @@ class PlacesSearchApiResponseAdapter(private val listRestaurant: List<Restaurant
     }
 
     override fun getItemCount(): Int {
-        return listRestaurant.size
+        return listRestaurant?.size ?: 0
     }
 
     override fun onBindViewHolder(holder: PlacesSearchApiResponseViewHolder, position: Int) {
-        holder.updateWithResponse(listRestaurant, position, glide)
+        holder.updateWithResponse(listRestaurant!!, position, glide)
     }
 
+    fun setDataRestaurants(restaurants: List<Restaurant>){
+        listRestaurant = restaurants
+        notifyDataSetChanged()
+    }
 
     class PlacesSearchApiResponseViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
 
@@ -53,7 +59,15 @@ class PlacesSearchApiResponseAdapter(private val listRestaurant: List<Restaurant
             textViewName.text = listRestaurants[position].name
             textViewAddress.text = listRestaurants[position].address
             textViewDistance.text = listRestaurants[position].distance
+            textViewTimeTable.text = listRestaurants[position].isOpen
             glide.load(listRestaurants[position].urlPicture).into(imageViewRestaurant)
+            for (index in listImageViewStars.indices){
+                if (index < listRestaurants[position].rating){
+                    listImageViewStars[index].visibility = View.VISIBLE
+                }else {
+                    listImageViewStars[index].visibility = View.GONE
+                }
+            }
 
         }
 

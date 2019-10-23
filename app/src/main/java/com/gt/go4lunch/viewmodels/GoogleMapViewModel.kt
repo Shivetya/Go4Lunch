@@ -35,7 +35,8 @@ class GoogleMapViewModel(private val listRestaurantsUseCase: GoogleListRestauran
             ?.map {
                 RestaurantMarker(it.name,
                     it.geometry.location.lat,
-                    it.geometry.location.lng)
+                    it.geometry.location.lng,
+                    it.placeId)
             }
 
         withContext(Dispatchers.Main){

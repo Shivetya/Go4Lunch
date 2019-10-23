@@ -81,17 +81,13 @@ class SettingsActivity : UserActivity() {
 
         activity_settings_progress_bar.visibility = View.VISIBLE
 
+        settingsViewModel.isOperationSucceed.observe(this, observerUserTaskSucceed)
+
         settingsViewModel.updateUsernameInFirestore(newUsername)
-
-        settingsViewModel.isOperationSucceed.observe(this, observerUserTaskSucceed.also {
-            setUsernameInTextView()
-        })
-
 
 
     }
 
-    //deplacer dans le viewModel
     private fun setUsernameInTextView(){
 
 
@@ -102,6 +98,12 @@ class SettingsActivity : UserActivity() {
         settingsViewModel.getUsernameForTextView()
 
 
+    }
+
+    override fun updateUI() {
+        activity_settings_progress_bar.visibility = View.GONE
+
+        setUsernameInTextView()
     }
 
 }

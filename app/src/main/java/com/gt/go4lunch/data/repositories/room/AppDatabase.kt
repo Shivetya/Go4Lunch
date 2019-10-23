@@ -5,13 +5,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.gt.go4lunch.MainApplication
 
-@Database(entities = [ResultTable::class, OpeningHoursTable::class, LocationTable::class, GeometryTable::class], version = 1, exportSchema = false)
+@Database(entities = [ResultTable::class,
+    OpeningHoursTable::class,
+    LocationTable::class,
+    GeometryTable::class,
+    PeriodsTable::class,
+    ResultDetailsTable::class], version = 1, exportSchema = false)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun resultDao(): ResultsDao
-    abstract fun openingHoursDao(): OpeningHoursDao
-    abstract fun locationDao(): LocationDao
-    abstract fun geometryDao(): GeometryDao
+    abstract fun periodDao(): PeriodsDao
+    abstract fun resultDetailsDao(): ResultDetailsDao
 
     companion object {
         private lateinit var INSTANCE: AppDatabase

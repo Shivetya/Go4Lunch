@@ -38,43 +38,74 @@ class ListRestaurantsViewModelTest {
         longitude = 6.5882000
     }
 
-    val googlePlacesResponse: PlacesSearchApiResponse = PlacesSearchApiResponse().apply {
-        results = listOf(Result().apply {
-            name = "Nom du restaurant ici !!!"
-            vicinity = "Adresse du restaurant ici !!!"
-            openingHours = OpeningHours().apply {
+    val googleNearbyPlacesResponse: PlacesSearchApiResponse = PlacesSearchApiResponse(
+        results = listOf(
+            Result(
+                name = "Nom du restaurant ici !!!",
+                vicinity = "Adresse du restaurant ici !!!",
+                icon = "url de l'image ici !!!",
+                geometry = Geometry(
+                    location = Location(
+                        lat = 16584.54654,
+                        lng = 3654.5754
+                    )
+                ),
+                types = listOf(
+                    "Veggie", "Vegan"
+                )
+            ), Result(
+                name = "Un deuxième nom de restaurant ici",
+                vicinity = "Une deuxième adresse !",
+                openingHours = OpeningHours(
+                    openNow = false
+                ),
+                icon = "Une deuxième url d'image",
+                geometry = Geometry(
+                    location = Location(
+                        lat = 496846521.4,
+                        lng = 68546151.6478
+                    )
+                ),
+                types = listOf(
+                    "non Veggie", "non Vegan"
+                )
+            )
+        )
+    )
+
+    val googleDetailsApiResponse = PlacesDetailsApiResponse(
+        result = Result(
+            name = "Nom du restaurant ici !!!",
+            vicinity = "Adresse du restaurant ici !!!",
+            openingHours = OpeningHours(
                 openNow = true
-            }
-            icon = "url de l'image ici !!!"
-            geometry = Geometry().apply {
-                location = Location().apply {
-                    lat = 16584.54654
+            ),
+            icon = "url de l'image ici !!!",
+            geometry = Geometry(
+                location = Location(
+                    lat = 16584.54654,
                     lng = 3654.5754
-                }
-            }
-            types = listOf("Veggie", "Vegan")
-        }, Result().apply {
-            name = "Un deuxième nom de restaurant ici"
-            vicinity = "Une deuxième adresse !"
-            openingHours = OpeningHours().apply {
-                openNow = false
-            }
-            icon = "Une deuxième url d'image"
-            geometry = Geometry().apply {
-                location = Location().apply {
-                    lat = 496846521.4
-                    lng = 68546151.6478
-                }
-            }
-            types = listOf("non Veggie", "non Vegan")
-        })
-    }
+                )
+            ),
+            types = listOf(
+                "Veggie", "Vegan"
+            ),
+            rating = 5.0
+        ),
+        htmlAttributions = null,
+        status = null
+    )
 
     @Before
-    fun setUseCase(){
+    fun setUseCase() {
         listRestaurantUseCase = object :
             GoogleListRestaurant {
-            override suspend fun getListRestaurant(location: String): PlacesSearchApiResponse? = googlePlacesResponse
+            override suspend fun getListRestaurant(location: String): PlacesSearchApiResponse? =
+                googleNearbyPlacesResponse
+
+            override suspend fun getDetailRestaurant(restaurantID: String): PlacesDetailsApiResponse? {
+                return googleDetailsApiResponse
+            }
         }
     }
 
@@ -95,7 +126,7 @@ class ListRestaurantsViewModelTest {
     @Test
     fun `should expose list of models (restaurant) - get name`() = runBlockingTest {
         //given
-        googlePlacesResponse.results?.get(0)?.apply {
+        googleNearbyPlacesResponse.results?.get(0)?.apply {
             name = "Bonjour"
         }
         val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
@@ -109,7 +140,7 @@ class ListRestaurantsViewModelTest {
     @Test
     fun `should expose list of models (restaurant) - get address`() = runBlockingTest {
         //given
-        googlePlacesResponse.results?.get(0)?.apply {
+        googleNearbyPlacesResponse.results?.get(0)?.apply {
             vicinity = "adresse"
         }
         val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
@@ -123,37 +154,28 @@ class ListRestaurantsViewModelTest {
     @Test
     fun `should expose list of models (restaurant) - get url picture`() = runBlockingTest {
         //given
-        googlePlacesResponse.results?.get(0)?.apply {
-            icon = "url de l'image"
+        googleNearbyPlacesResponse.results?.get(0)?.apply {
+            photos = listOf(Photo(
+                htmlAttributions = null,
+                height = null,
+                photoReference = "url de l'image"
+            ))
         }
         val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 
         listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        assertEquals("url de l'image", listRestaurantsViewModel.listRestaurants.value?.get(0)?.urlPicture)
-    }
-
-    @Test
-    fun `should expose list of models (restaurant) - get is open`() = runBlockingTest {
-        //given
-        googlePlacesResponse.results?.get(0)?.apply {
-            openingHours = OpeningHours().apply {
-                openNow = true
-            }
-        }
-        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
-
-        listRestaurantsViewModel.fetchListRestaurants(loc)
-
-        //then
-        assertEquals("true", listRestaurantsViewModel.listRestaurants.value?.get(0)?.isOpen)
+        assertEquals(
+            "url de l'image",
+            listRestaurantsViewModel.listRestaurants.value?.get(0)?.urlPicture
+        )
     }
 
     @Test
     fun `should expose list of models (restaurant) - get types`() = runBlockingTest {
         //given
-        googlePlacesResponse.results?.get(0)?.apply {
+        googleNearbyPlacesResponse.results?.get(0)?.apply {
             types = listOf("veggie", "Très bon")
         }
         val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
@@ -161,26 +183,32 @@ class ListRestaurantsViewModelTest {
         listRestaurantsViewModel.fetchListRestaurants(loc)
 
         //then
-        assertEquals("veggie, Très bon",
-            listRestaurantsViewModel.listRestaurants.value?.get(0)?.types)
+        assertEquals(
+            "veggie, Très bon",
+            listRestaurantsViewModel.listRestaurants.value?.get(0)?.types
+        )
     }
 
     @Test
-    fun `should expose list of models (restaurant) - get second restaurant name`() = runBlockingTest {
-        //given
-        googlePlacesResponse.results?.get(1)?.apply {
-            name = "second restaurant name here"
+    fun `should expose list of models (restaurant) - get second restaurant name`() =
+        runBlockingTest {
+            //given
+            googleNearbyPlacesResponse.results?.get(1)?.apply {
+                name = "second restaurant name here"
+            }
+            val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
+
+            listRestaurantsViewModel.fetchListRestaurants(loc)
+
+            //then
+            assertEquals(
+                "second restaurant name here",
+                listRestaurantsViewModel.listRestaurants.value?.get(1)?.name
+            )
         }
-        val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
-
-        listRestaurantsViewModel.fetchListRestaurants(loc)
-
-        //then
-        assertEquals("second restaurant name here", listRestaurantsViewModel.listRestaurants.value?.get(1)?.name)
-    }
 
     @Test
-    fun `should transform Location to string for query`(){
+    fun `should transform Location to string for query`() {
 
         //given
         loc.latitude = 6654.564
@@ -197,13 +225,13 @@ class ListRestaurantsViewModelTest {
     @Test
     fun `should expose list of models (restaurant) - get distance`() = runBlockingTest {
         //given
-        googlePlacesResponse.results?.get(0)?.apply {
-            geometry = Geometry().apply {
-                location = Location().apply {
-                    lat = 48.1833300
+        googleNearbyPlacesResponse.results?.get(0)?.apply {
+            geometry = Geometry(
+                location = Location(
+                    lat = 48.1833300,
                     lng = 6.4500000
-                }
-            }
+                )
+            )
         }
         val listRestaurantsViewModel = ListRestaurantsViewModel(listRestaurantUseCase)
 

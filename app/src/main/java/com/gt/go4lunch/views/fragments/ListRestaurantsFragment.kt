@@ -28,7 +28,6 @@ class ListRestaurantsFragment : Fragment() {
     }
 
     private lateinit var viewModel: ListRestaurantsViewModel
-    private lateinit var restaurants: MutableList<Restaurant>
     lateinit var adapter: PlacesSearchApiResponseAdapter
 
     override fun onCreateView(
@@ -57,17 +56,14 @@ class ListRestaurantsFragment : Fragment() {
         })
     }
 
-    private fun updateUI(listRestaurants: Collection<Restaurant>){
-        restaurants.clear()
-        restaurants.addAll(listRestaurants)
-        adapter.notifyDataSetChanged()
+    private fun updateUI(listRestaurants: List<Restaurant>){
+        adapter.setDataRestaurants(listRestaurants)
     }
 
     private fun configureRecyclerView(recyclerView : RecyclerView){
 
-        restaurants = mutableListOf()
         recyclerView.layoutManager = LinearLayoutManager(activity?.applicationContext)
-        adapter = PlacesSearchApiResponseAdapter(restaurants, Glide.with(this))
+        adapter = PlacesSearchApiResponseAdapter(Glide.with(this))
         recyclerView.adapter = adapter
 
     }

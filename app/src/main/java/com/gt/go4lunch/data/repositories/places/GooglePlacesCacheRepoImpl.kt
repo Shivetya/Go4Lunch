@@ -1,23 +1,26 @@
 package com.gt.go4lunch.data.repositories.places
 
+import android.media.Image
 import com.gt.go4lunch.data.*
 import com.gt.go4lunch.data.repositories.room.*
 import org.joda.time.DateTime
 
 
-class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
+class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo) :
     GooglePlacesCacheRepo {
 
-    companion object{
+    companion object {
         val instance: GooglePlacesCacheRepo by lazy {
             GooglePlacesCacheRepoImpl(GooglePlacesRepoImpl())
         }
     }
 
     private val resultsDao = AppDatabase.getInstance().resultDao()
+    private val periodsDao = AppDatabase.getInstance().periodDao()
+    private val resultDetailsDao = AppDatabase.getInstance().resultDetailsDao()
 
 
-    override suspend fun getListRestaurants(location: String): PlacesSearchApiResponse?{
+    override suspend fun getListRestaurants(location: String): PlacesSearchApiResponse? {
 
         val latUser = location.substringBefore(",").toDouble()
         val lngUser = location.substringAfter(",").toDouble()
@@ -26,7 +29,7 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
 
         val cacheResults = resultsDao.getResultsByCache(latUser, lngUser, dateTimeNow.toString())
 
-        return if (cacheResults.isEmpty()){
+        return if (cacheResults.isEmpty()) {
 
             resultsDao.deleteAllResults(dateTimeNow.toString())
 
@@ -44,67 +47,81 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
     }
 
 
-    private suspend fun saveResultListRestaurant(resultApi: PlacesSearchApiResponse?, ttl: String, actualLatUser: Double, actualLngUser: Double){
+    private suspend fun saveResultListRestaurant(
+        resultApi: PlacesSearchApiResponse?,
+        ttl: String,
+        actualLatUser: Double,
+        actualLngUser: Double
+    ) {
         resultApi?.results?.map {
-            resultsDao.insertResult(ResultTable(
-                geometry = GeometryTable(
-                    location = LocationTable(
-                        lat = it.geometry.location.lat,
-                        lng = it.geometry.location.lng
-                    )
-                ), opening_hours = OpeningHoursTable(
-                    openNow = it.openingHours?.openNow,
-                    periods = null
-                ), name = it.name,
-                types = it.types?.joinToString(),
-                vicinity = it.vicinity,
-                ttl = ttl,
-                latUser = actualLatUser,
-                lngUser = actualLngUser,
-                restaurantId = it.placeId
-            ))
+            resultsDao.insertResult(
+                ResultTable(
+                    geometry = GeometryTable(
+                        location = LocationTable(
+                            lat = it.geometry.location.lat,
+                            lng = it.geometry.location.lng
+                        )
+                    ), opening_hours = OpeningHoursTable(
+                        openNow = it.openingHours?.openNow
+                    ), name = it.name,
+                    types = it.types?.joinToString(),
+                    vicinity = it.vicinity,
+                    ttl = ttl,
+                    latUser = actualLatUser,
+                    lngUser = actualLngUser,
+                    restaurantId = it.placeId
+                )
+            )
         }
     }
 
-    private fun mapCacheResultsListRestaurant(cacheResults: List<ResultTable>): PlacesSearchApiResponse{
+    private fun mapCacheResultsListRestaurant(cacheResults: List<ResultTable>): PlacesSearchApiResponse {
 
-        return PlacesSearchApiResponse().apply {
+        val results = mutableListOf<Result>()
 
-            results = mutableListOf()
+        for (resultsDao in cacheResults) {
 
-            for (resultsDao in cacheResults){
+            resultsDao.let {
 
-                resultsDao.let {
-
-                    (results as MutableList<Result>).add(Result().apply {
-
-                        this.name = it.name
-                        this.vicinity = it.vicinity
-                        this.types = it.types?.split(", ")
-                        this.geometry = Geometry().apply {
-                            this.location = Location().apply {
-                                this.lat = it.geometry?.location?.lat
-                                this.lng = it.geometry?.location?.lng
-                            }
-                        }
-                        this.openingHours = OpeningHours().apply {
-                            this.openNow = it.opening_hours?.openNow
-                        }
-                    })
-                }
+                results.add(
+                    Result(
+                        name = it.name,
+                        vicinity = it.vicinity,
+                        types = it.types?.split(", "),
+                        geometry = Geometry(
+                            Location(
+                                it.geometry.location.lat,
+                                it.geometry.location.lng
+                            )
+                        ),
+                        openingHours = OpeningHours(
+                            openNow = it.opening_hours?.openNow,
+                            periods = null,
+                            weekdayText = null
+                        )
+                    )
+                )
             }
         }
+
+        return PlacesSearchApiResponse(
+            htmlAttributions = null,
+            status = null,
+            results = results
+        )
     }
 
     override suspend fun getDetailsRestaurant(restaurantId: String): PlacesDetailsApiResponse? {
 
         val dateTimeNow = DateTime()
 
-        val cacheResults = resultsDao.getResultDetailsByCache(restaurantId, dateTimeNow.toString())
+        val cacheRating = resultDetailsDao.getRatingByCache(restaurantId, dateTimeNow.toString())
+        val cachePeriods = periodsDao.getPeriodsByCache(restaurantId, dateTimeNow.toString())
 
-        return if (cacheResults == null){
+        return if (cacheRating == null || cachePeriods.isEmpty()) {
 
             resultsDao.deleteAllResults(dateTimeNow.toString())
+            periodsDao.deleteAllPeriods(dateTimeNow.toString())
 
             val resultsApi = placesRepo.getDetailsRestaurant(restaurantId)
 
@@ -114,54 +131,80 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo):
 
             resultsApi
         } else {
-            mapCacheDetailsRestaurant(cacheResults)
+            mapCacheDetailsRestaurant(cacheRating, cachePeriods)
         }
     }
 
-    private suspend fun saveDetailsRestaurant(resultApi: PlacesDetailsApiResponse?, ttl: String, restaurantID: String){
+    private suspend fun saveDetailsRestaurant(
+        resultApi: PlacesDetailsApiResponse?,
+        ttl: String,
+        restaurantID: String
+    ) {
         resultApi?.result.let { result ->
-            resultsDao.insertResult(ResultTable(
-                opening_hours = OpeningHoursTable(
-                    periods = result?.openingHours?.periods?.map {
+            resultDetailsDao.insertResultDetails(
+                ResultDetailsTable(
+                    ttl = ttl,
+                    restaurantId = restaurantID,
+                    rating = result?.rating
+                )
+            )
+            val periods = result?.openingHours?.periods
+            if (periods != null) {
+                for (period in periods) {
+                    periodsDao.insertPeriod(
                         PeriodsTable(
-                            close = CloseTable(
-                                day = it.close?.day,
-                                time = it.close?.time
-                            ),
                             open = OpenTable(
-                                day = it.open?.day,
-                                time = it.open?.time
+                                dayopen = period.open?.day,
+                                timeopen = period.open?.time
+                            ),
+                            close = CloseTable(
+                                dayclose = period.close?.day,
+                                timeclose = period.close?.time
+                            ),
+                            ttl = ttl,
+                            restaurantId = restaurantID
+                        )
+                    )
+                }
+            }
+
+        }
+    }
+
+    private fun mapCacheDetailsRestaurant(
+        cacheResultsDetails: Double,
+        cacheListPeriods: List<PeriodsTable>
+    ): PlacesDetailsApiResponse {
+
+        return PlacesDetailsApiResponse(
+            result = Result(
+                openingHours = OpeningHours(
+                    periods = cacheListPeriods.map {
+                        Period(
+                            open = Open(
+                                day = it.open?.dayopen,
+                                time = it.open?.timeopen
+                            ),
+                            close = Close(
+                                day = it.close?.dayclose,
+                                time = it.close?.timeclose
                             )
                         )
-                    }
+                    },
+                    openNow = null,
+                    weekdayText = null
                 ),
-                ttl = ttl,
-                restaurantId = restaurantID,
-                rating = result?.rating
-            ))
-        }
+                rating = cacheResultsDetails,
+                name = "",
+                geometry = Geometry(Location(0.0,0.0))
+            ),
+            htmlAttributions = null,
+            status = null
+        )
     }
 
-    private fun mapCacheDetailsRestaurant(cacheResults: ResultTable): PlacesDetailsApiResponse{
-        return PlacesDetailsApiResponse().apply {
-            result = Result().apply {
-                openingHours = OpeningHours().apply {
-                    periods = cacheResults.opening_hours?.periods?.map {
-                        Period().apply {
-                            open = Open().apply {
-                                day = it?.open?.day
-                                time = it?.open?.time
-                            }
-                            close = Close().apply {
-                                day = it?.close?.day
-                                time = it?.close?.time
-                            }
-                        }
-                    }
-                }
-                rating = cacheResults.rating
-            }
-        }
+    override suspend fun getPhotoRestaurant(photoId: String): Image? {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }

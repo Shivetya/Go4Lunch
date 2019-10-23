@@ -6,5 +6,5 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class CloseTable (@PrimaryKey (autoGenerate = true) @ColumnInfo (name = "close_id") val closeID: Int = 0,
-                       val day: Int?,
-                       val time: String?)
+                       val dayclose: Int?,
+                       val timeclose: String?)

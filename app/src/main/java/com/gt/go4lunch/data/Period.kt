@@ -3,13 +3,13 @@ package com.gt.go4lunch.data
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-class Period {
+data class Period (
 
     @SerializedName("close")
     @Expose
-    var close: Close? = null
+    var close: Close?,
     @SerializedName("open")
     @Expose
-    var open: Open? = null
+    var open: Open?
 
-}
+)

@@ -51,5 +51,7 @@
     <string name="open_until_2pm">Open until 2pm</string>
     <string name="this_is_an_address_for_a_restaurant">This is an address for a restaurant</string>
     <string name="restaurant_name_here">Restaurant name here</string>
+    <string name="closed_today">Closed today !</string>
+    <string name="no_opening_hours">No opening hours known here !</string>
 
 </resources>

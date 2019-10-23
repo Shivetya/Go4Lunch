@@ -21,6 +21,7 @@ class ViewModelFactory private constructor(private val usersFirestoreUseCase: Us
             modelClass.isAssignableFrom(SettingsViewModel::class.java) -> SettingsViewModel(usersFirestoreUseCase) as T
             modelClass.isAssignableFrom(ListRestaurantsViewModel::class.java) -> ListRestaurantsViewModel(googleListRestaurantsUseCase) as T
             modelClass.isAssignableFrom(GoogleMapViewModel::class.java) -> GoogleMapViewModel(googleListRestaurantsUseCase) as T
+            modelClass.isAssignableFrom(UserViewModel::class.java) -> UserViewModel() as T
             else -> throw IllegalArgumentException("Wrong UseCase Parameter")
         }
     }

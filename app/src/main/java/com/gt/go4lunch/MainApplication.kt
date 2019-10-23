@@ -5,7 +5,7 @@ import android.app.Application
 class MainApplication: Application() {
 
     companion object{
-        private lateinit var instanceApp: MainApplication
+        lateinit var instanceApp: MainApplication
 
         fun getInstance(): Application {
             return instanceApp
