@@ -1,6 +1,5 @@
 package com.gt.go4lunch.data.repositories.places
 
-import android.media.Image
 import com.gt.go4lunch.data.PlacesDetailsApiResponse
 import com.gt.go4lunch.data.PlacesSearchApiResponse
 import retrofit2.Call
@@ -16,8 +15,4 @@ interface GooglePlacesApi {
     @GET("maps/api/place/details/json")
     fun getDetailsForRestaurant(@Query("place_id")placeId: String)
             : Call<PlacesDetailsApiResponse>
-
-    @GET("maps/api/place/photo")
-    fun getPhotoForRestaurant(@Query("photoreference")photoReference: String)
-            : Call<Image>
 }

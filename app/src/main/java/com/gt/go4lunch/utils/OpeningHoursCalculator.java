@@ -95,10 +95,10 @@ public class OpeningHoursCalculator {
                 }
 
             } catch (NullPointerException e) {
-                mStringToReturn = MainApplication.instanceApp.getString(R.string.no_opening_hours);
+                mStringToReturn = MainApplication.getInstance().getString(R.string.no_opening_hours);
             }
         } else {
-            mStringToReturn = MainApplication.instanceApp.getString(R.string.no_opening_hours);
+            mStringToReturn = MainApplication.getInstance().getString(R.string.no_opening_hours);
         }
 
         return mStringToReturn;

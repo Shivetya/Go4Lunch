@@ -22,12 +22,14 @@ class ViewModelFactory private constructor(private val usersFirestoreUseCase: Us
             modelClass.isAssignableFrom(ListRestaurantsViewModel::class.java) -> ListRestaurantsViewModel(googleListRestaurantsUseCase) as T
             modelClass.isAssignableFrom(GoogleMapViewModel::class.java) -> GoogleMapViewModel(googleListRestaurantsUseCase) as T
             modelClass.isAssignableFrom(UserViewModel::class.java) -> UserViewModel() as T
+            modelClass.isAssignableFrom(WorkMatesViewModel::class.java) -> WorkMatesViewModel(usersFirestoreUseCase) as T
             else -> throw IllegalArgumentException("Wrong UseCase Parameter")
         }
     }
 
     companion object {
 
+        @JvmStatic
         val INSTANCE = ViewModelFactory(UsersFirestoreUseCase(),
             LocationRepoImpl.instance,
             GoogleListRestaurantsUseCase.instance

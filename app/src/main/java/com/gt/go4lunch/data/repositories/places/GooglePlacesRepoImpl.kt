@@ -1,6 +1,5 @@
 package com.gt.go4lunch.data.repositories.places
 
-import android.media.Image
 import com.gt.go4lunch.data.PlacesDetailsApiResponse
 import com.gt.go4lunch.data.PlacesSearchApiResponse
 import com.gt.go4lunch.utils.ApiKeyGitIgnore
@@ -21,7 +20,6 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
 
         private var serviceNearbyRestaurant: GooglePlacesApi
         private var serviceDetailsRestaurant: GooglePlacesApi
-        private var servicePhotoRestaurant: GooglePlacesApi
 
         private const val KEY_NAME = "key"
         private const val API_KEY = ApiKeyGitIgnore.API_PLACES_KEY
@@ -129,45 +127,6 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
 
             serviceDetailsRestaurant = retrofitDetailsRestaurant.create(
                 GooglePlacesApi::class.java)
-
-            //third part for photo Restaurant
-
-            val paramsInterceptorPhotoRestaurant = Interceptor{ chain ->
-                var request = chain.request()
-                val url = request.url()
-                    .newBuilder()
-                    .addQueryParameter(
-                        MAXWIDTH_NAME,
-                        MAXWIDTH_VALUE
-                    )
-                    .addQueryParameter(
-                        MAXHEIGHT_NAME,
-                        MAXHEIGHT_VALUE
-                    )
-                    .addQueryParameter(
-                        KEY_NAME,
-                        API_KEY
-                    )
-                    .build()
-                request = request.newBuilder().url(url).build()
-                chain.proceed(request)
-            }
-
-            val clientPhotoRestaurant = OkHttpClient.Builder()
-                .sslSocketFactory(TLSSocketFactory(), trustManager)
-                .addInterceptor(paramsInterceptorPhotoRestaurant)
-                .addInterceptor(loggingInterceptor)
-                .build()
-
-            val retrofitPhotoRestaurant = Retrofit.Builder()
-                .baseUrl("https://maps.googleapis.com/")
-                .client(clientPhotoRestaurant)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-
-            servicePhotoRestaurant = retrofitPhotoRestaurant.create(
-                GooglePlacesApi::class.java)
-
         }
     }
 
@@ -177,10 +136,6 @@ class GooglePlacesRepoImpl: GooglePlacesRepo {
 
     override fun getDetailsRestaurant(restaurantId: String): PlacesDetailsApiResponse? {
         return serviceDetailsRestaurant.getDetailsForRestaurant(restaurantId).execute().body()
-    }
-
-    override fun getPhotoRestaurant(photoId: String): Image? {
-        return servicePhotoRestaurant.getPhotoForRestaurant(photoId).execute().body()
     }
 
 }

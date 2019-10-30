@@ -24,6 +24,7 @@ import com.gt.go4lunch.viewmodels.LoggedViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
 import com.gt.go4lunch.views.fragments.GoogleMapFragment
 import com.gt.go4lunch.views.fragments.ListRestaurantsFragment
+import com.gt.go4lunch.views.fragments.WorkMatesFragment
 import kotlinx.android.synthetic.main.activity_logged.*
 import kotlinx.android.synthetic.main.nav_header_logged.view.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -138,6 +139,7 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
                     launchListRestaurantsFragment()
                 }
                 R.id.menu_bottom_nav_workmates -> {
+                    launchWorkMatesFragment()
 
                 }
             }
@@ -199,6 +201,13 @@ class LoggedActivity : UserActivity(), NavigationView.OnNavigationItemSelectedLi
         val listRestaurantsFragment = ListRestaurantsFragment.newInstance()
 
         supportFragmentManager.beginTransaction().replace(R.id.activity_logged_frame_layout, listRestaurantsFragment).commit()
+    }
+
+    private fun launchWorkMatesFragment(){
+
+        val workMatesFragment = WorkMatesFragment.newInstance()
+
+        supportFragmentManager.beginTransaction().replace(R.id.activity_logged_frame_layout, workMatesFragment).commit()
     }
 
     private fun checkLocationAccessGranted(){

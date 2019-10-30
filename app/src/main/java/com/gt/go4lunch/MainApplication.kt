@@ -5,8 +5,9 @@ import android.app.Application
 class MainApplication: Application() {
 
     companion object{
-        lateinit var instanceApp: MainApplication
+        private lateinit var instanceApp: MainApplication
 
+        @JvmStatic
         fun getInstance(): Application {
             return instanceApp
         }

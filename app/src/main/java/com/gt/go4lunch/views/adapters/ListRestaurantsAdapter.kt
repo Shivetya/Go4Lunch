@@ -1,5 +1,6 @@
 package com.gt.go4lunch.views.adapters
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,13 +9,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.RequestManager
 import com.gt.go4lunch.R
+import com.gt.go4lunch.data.repositories.places.GooglePhotoRepo
 import com.gt.go4lunch.models.Restaurant
-import kotlinx.android.synthetic.main.recycler_view_item.view.*
+import kotlinx.android.synthetic.main.list_restaurant_recycler_view_item.view.*
 
-class PlacesSearchApiResponseAdapter(private val glide: RequestManager) : RecyclerView.Adapter<PlacesSearchApiResponseAdapter.PlacesSearchApiResponseViewHolder>(){
+class ListRestaurantsAdapter(private val glide: RequestManager) : RecyclerView.Adapter<ListRestaurantsAdapter.PlacesSearchApiResponseViewHolder>(){
 
     private var listRestaurant: List<Restaurant>? = null
-
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -23,7 +24,7 @@ class PlacesSearchApiResponseAdapter(private val glide: RequestManager) : Recycl
 
         val context = parent.context
         val inflater = LayoutInflater.from(context)
-        val view = inflater.inflate(R.layout.recycler_view_item, parent, false)
+        val view = inflater.inflate(R.layout.list_restaurant_recycler_view_item, parent, false)
 
         return PlacesSearchApiResponseViewHolder(view)
     }
@@ -60,7 +61,16 @@ class PlacesSearchApiResponseAdapter(private val glide: RequestManager) : Recycl
             textViewAddress.text = listRestaurants[position].address
             textViewDistance.text = listRestaurants[position].distance
             textViewTimeTable.text = listRestaurants[position].isOpen
-            glide.load(listRestaurants[position].urlPicture).into(imageViewRestaurant)
+            GooglePhotoRepo.getInstance().getBitmapImage(listRestaurants[position].photoId, object : GooglePhotoRepo.Callback{
+                override fun onRequestFailed() {
+
+                }
+
+                override fun onImageLoaded(image: Bitmap?) {
+                    glide.load(image).into(imageViewRestaurant)
+                }
+
+            })
             for (index in listImageViewStars.indices){
                 if (index < listRestaurants[position].rating){
                     listImageViewStars[index].visibility = View.VISIBLE
@@ -68,6 +78,8 @@ class PlacesSearchApiResponseAdapter(private val glide: RequestManager) : Recycl
                     listImageViewStars[index].visibility = View.GONE
                 }
             }
+
+
 
         }
 

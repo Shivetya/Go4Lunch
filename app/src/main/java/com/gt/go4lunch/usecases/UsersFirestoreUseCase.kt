@@ -3,11 +3,10 @@ package com.gt.go4lunch.usecases
 
 import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.QuerySnapshot
 import com.gt.go4lunch.models.User
 
 class UsersFirestoreUseCase {
@@ -26,7 +25,7 @@ class UsersFirestoreUseCase {
         urlProfilePicture: String?
     ): Task<DocumentSnapshot>? {
 
-        val userToSet = User(userID, userName, urlProfilePicture)
+        val userToSet = User(userID, userName, urlProfilePicture, "")
 
         return getUser(userID).addOnSuccessListener {
             if (!it.exists() || it == null) {
@@ -49,4 +48,7 @@ class UsersFirestoreUseCase {
         return getUsersCollection().document(userID).delete()
     }
 
+    fun getAllUsers(): Task<QuerySnapshot> {
+        return getUsersCollection().get()
+    }
 }

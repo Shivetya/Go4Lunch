@@ -43,7 +43,7 @@ class ListRestaurantsViewModel(private val listRestaurantsUseCase: GoogleListRes
 
                 val distance = location.distanceTo(locationRestaurant)
                     Restaurant(name = it.name,
-                        urlPicture =  it.photos?.get(0)?.photoReference,
+                        photoId =  it.photos?.get(0)?.photoReference,
                         address =  it.vicinity,
                         isOpen = getOpenOrCloseString(it.placeId),
                         distance = distance.toString().substringBefore("."),

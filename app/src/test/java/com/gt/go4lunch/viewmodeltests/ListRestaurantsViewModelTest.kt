@@ -168,7 +168,7 @@ class ListRestaurantsViewModelTest {
         //then
         assertEquals(
             "url de l'image",
-            listRestaurantsViewModel.listRestaurants.value?.get(0)?.urlPicture
+            listRestaurantsViewModel.listRestaurants.value?.get(0)?.photoId
         )
     }
 

@@ -17,7 +17,7 @@ import com.gt.go4lunch.data.repositories.location.LocationRepoImpl
 import com.gt.go4lunch.models.Restaurant
 import com.gt.go4lunch.viewmodels.ListRestaurantsViewModel
 import com.gt.go4lunch.viewmodels.ViewModelFactory
-import com.gt.go4lunch.views.adapters.PlacesSearchApiResponseAdapter
+import com.gt.go4lunch.views.adapters.ListRestaurantsAdapter
 
 class ListRestaurantsFragment : Fragment() {
 
@@ -28,7 +28,7 @@ class ListRestaurantsFragment : Fragment() {
     }
 
     private lateinit var viewModel: ListRestaurantsViewModel
-    lateinit var adapter: PlacesSearchApiResponseAdapter
+    lateinit var adapter: ListRestaurantsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,7 +63,7 @@ class ListRestaurantsFragment : Fragment() {
     private fun configureRecyclerView(recyclerView : RecyclerView){
 
         recyclerView.layoutManager = LinearLayoutManager(activity?.applicationContext)
-        adapter = PlacesSearchApiResponseAdapter(Glide.with(this))
+        adapter = ListRestaurantsAdapter(Glide.with(this))
         recyclerView.adapter = adapter
 
     }

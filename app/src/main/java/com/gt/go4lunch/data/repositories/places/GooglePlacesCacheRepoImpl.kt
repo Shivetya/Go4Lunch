@@ -1,6 +1,5 @@
 package com.gt.go4lunch.data.repositories.places
 
-import android.media.Image
 import com.gt.go4lunch.data.*
 import com.gt.go4lunch.data.repositories.room.*
 import org.joda.time.DateTime
@@ -201,10 +200,6 @@ class GooglePlacesCacheRepoImpl(private val placesRepo: GooglePlacesRepo) :
             htmlAttributions = null,
             status = null
         )
-    }
-
-    override suspend fun getPhotoRestaurant(photoId: String): Image? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }
